@@ -125,7 +125,7 @@ h1, h2, h3, .founder-quote p { font-family: var(--display); }
 .footer-brand { display: grid; align-content: start; }
 .footer-brand strong { color: var(--ivory); font-size: 1.15rem; font-weight: 550; }
 .footer-brand span { font-size: .5rem; letter-spacing: .24em; }
-.footer-links { display: flex; gap: 1.4rem; justify-content: end; color: var(--ivory); }
+.footer-links { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; justify-content: end; color: var(--ivory); }
 .empty-note { padding: 3rem 0; color: var(--dim); }
 
 .page-hero { min-height: 82vh; display: grid; align-content: end; padding: clamp(11rem,20vh,16rem) var(--pad) clamp(5rem,12vh,9rem); border-bottom: 1px solid var(--line); }
@@ -196,6 +196,12 @@ h1, h2, h3, .founder-quote p { font-family: var(--display); }
 .contact-grid h2 { margin: 6rem 0 1.5rem; font-size: clamp(2.3rem,4vw,4.2rem); }
 .contact-grid p { min-height: 9rem; color: var(--dim); }
 .pending-label { display: inline-block; padding: .6rem 0; border-bottom: 1px solid var(--line); color: var(--dim); font-size: .78rem; }
+.contact-channel-link { display: flex; width: 100%; min-height: 76px; padding: 1.2rem 1.4rem; border: 1px solid var(--green); color: var(--green); font-size: clamp(1rem,1.5vw,1.25rem); font-weight: 500; align-items: center; justify-content: center; text-align: center; transition: color .25s ease, background-color .25s ease; }
+.contact-channel-link:hover, .contact-channel-link:focus-visible { color: var(--ivory); background: var(--green); }
+.contact-page-hero > p:last-child { max-width: 42ch; }
+.contact-page-grid article { display: flex; flex-direction: column; }
+.contact-page-grid .contact-channel-link { margin-top: auto; }
+.contact-note strong { font-size: 1.2rem; font-weight: 400; }
 
 .story-index { background: var(--ivory); }
 .story-page-hero > p:last-child { max-width: 40ch; }
