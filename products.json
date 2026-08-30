@@ -1,69 +1,7 @@
-{
-  "source": "smartstore.naver.com",
-  "collectedAt": "2026-08-30",
-  "products": [
-    {
-      "name": "넥스젠 EGF 토마호크 미세침 스피큘세럼 니들앰플",
-      "price": 165000,
-      "regularPrice": 330000,
-      "discountRate": 50,
-      "tagline": "집중적인 앰플 루틴이 필요할 때",
-      "image": "https://shop-phinf.pstatic.net/20240922_223/17269657924360378R_JPEG/41859081672489213_166871325.jpg?type=o1000",
-      "url": "https://smartstore.naver.com/withnexgen/products/4906451137"
-    },
-    {
-      "name": "넥스젠화장품 동안앰플 펩타이드에센스",
-      "price": 165000,
-      "regularPrice": 165000,
-      "discountRate": 0,
-      "tagline": "건조한 피부에 촉촉함을 더할 때",
-      "image": "https://shop-phinf.pstatic.net/20250911_57/1757560321791SAOA9_JPEG/91693162827929482_144261042.jpg?type=o1000",
-      "url": "https://smartstore.naver.com/withnexgen/products/4876946436"
-    },
-    {
-      "name": "넥스젠 레이저시술후 재생크림 피부과 EGF 재생크림",
-      "price": 275000,
-      "regularPrice": 550000,
-      "discountRate": 50,
-      "tagline": "비싸도 안 건조해서 써요",
-      "image": "https://shop-phinf.pstatic.net/20260301_79/1772355644776qSpOI_PNG/4057360277092767_1079490227.png?type=o1000",
-      "url": "https://smartstore.naver.com/withnexgen/products/6644299986"
-    },
-    {
-      "name": "넥스젠 바르는 비타민CE 항산화 앰플 순수비타민C 세럼",
-      "price": 44000,
-      "regularPrice": 88000,
-      "discountRate": 50,
-      "tagline": "비타민 케어를 더하고 싶을 때",
-      "image": "https://shop-phinf.pstatic.net/20260405_238/1775317969797OexGN_PNG/103524108544844695_1873748666.png?type=o1000",
-      "url": "https://smartstore.naver.com/withnexgen/products/4837327466"
-    },
-    {
-      "name": "넥스젠 나이아신아마드 활성egf 바하성분 여드름앰플",
-      "price": 49500,
-      "regularPrice": 99000,
-      "discountRate": 50,
-      "tagline": "모공과 피부결이 신경 쓰일 때",
-      "image": "https://shop-phinf.pstatic.net/20250722_51/1753155594528OFNYJ_JPEG/85972858426938532_678337675.jpg?type=o1000",
-      "url": "https://smartstore.naver.com/withnexgen/products/4837841490"
-    },
-    {
-      "name": "넥스젠 얼굴세럼 활성EGF 주름개선제",
-      "price": 66000,
-      "regularPrice": 132000,
-      "discountRate": 50,
-      "tagline": "매일 촉촉한 세럼이 필요할 때",
-      "image": "https://shop-phinf.pstatic.net/20250101_69/1735722198483wACUp_JPEG/69854990541011821_301134788.jpg?type=o1000",
-      "url": "https://smartstore.naver.com/withnexgen/products/4840670268"
-    },
-    {
-      "name": "넥스젠 오일폼 건성약산성폼클렌징 올인원클렌징",
-      "price": 38500,
-      "regularPrice": 77000,
-      "discountRate": 50,
-      "tagline": "건조한 피부의 세안이 고민될 때",
-      "image": "https://shop-phinf.pstatic.net/20240918_295/1726627872881cUvDR_JPEG/30184746612933609_63970299.jpg?type=o1000",
-      "url": "https://smartstore.naver.com/withnexgen/products/5008714899"
-    }
-  ]
-}
+{"products":[
+  {"id":"daily-seat-cushion","name":"데일리 시트 방석","category":"fabric","categoryLabel":"FABRIC","tagline":"오래 앉아 있는 시간을 더 편안하게","price":null,"image":"","featured":true,"url":"https://www.coupang.com/"},
+  {"id":"soft-cushion","name":"소프트 데일리 쿠션","category":"fabric","categoryLabel":"FABRIC","tagline":"쉬고 싶은 순간, 포신함을 하나 더","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"},
+  {"id":"calm-tissue-case","name":"캄 티슈케이스","category":"organize","categoryLabel":"ORGANIZE","tagline":"자주 보는 생활품도 공간에 자연스럽게","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"},
+  {"id":"safe-bike-lock","name":"데일리 자전거 자물쇠","category":"outdoor","categoryLabel":"OUTDOOR","tagline":"잠시 멈추는 순간에도 든든하게","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"},
+  {"id":"clean-shelf-mat","name":"클린 선반 매트","category":"organize","categoryLabel":"ORGANIZE","tagline":"서랍과 선반을 매일 깔끔하게","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"}
+]}

@@ -6,10 +6,10 @@
      클래스 이름은 전부 rdcart- 로 시작해서 내 사이트 CSS 와 겹치지 않습니다.
    ========================================================================== */
 :root {
-  --cart-bg:     #FFFFFF;   /* NEXGEN 화이트 */
-  --cart-ink:    #2E2E2E;   /* NEXGEN 차콜 */
-  --cart-line:   rgba(46, 46, 46, .18);
-  --cart-accent: #2F6FED;   /* NEXGEN 코발트 */
+  --cart-bg:     #fffaf3;
+  --cart-ink:    #292621;
+  --cart-line:   rgba(41, 38, 33, .17);
+  --cart-accent: #b7674f;
   --cart-radius: 0;
   --cart-font:   "Noto Sans KR", Arial, sans-serif;
 }
