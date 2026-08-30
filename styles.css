@@ -84,13 +84,11 @@ p { max-width: 40ch; }
 .product-info h3 { margin: 0; font-size: 1.35rem; font-weight: 350; letter-spacing: -.035em; }
 .product-info > span { display: block; max-width: 32ch; margin: .55rem 0 1.3rem; color: var(--dim); font-size: .84rem; }
 .product-option { display: block; margin-top: .45rem; color: var(--dim); font-size: .7rem; }
-.product-price { display: grid; margin: 1.6rem 0; border-top: 1px solid var(--line); }
-.product-price > div { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid var(--line); }
-.product-price dt { color: var(--dim); font-size: .68rem; }
-.product-price dd { margin: 0; font-size: .78rem; font-weight: 500; }
-.product-price .discount-rate { color: var(--accent); }
-.product-price .sale-price { align-items: baseline; padding-block: .8rem; }
-.product-price .sale-price dd { font-size: 1.35rem; font-weight: 600; letter-spacing: -.04em; }
+.product-price { display: grid; gap: .25rem; justify-items: start; margin: 1.6rem 0; }
+.price-main { display: flex; gap: .5rem; align-items: baseline; }
+.price-main span { color: var(--accent); font-size: clamp(.9rem,1.4vw,1.08rem); font-weight: 500; }
+.price-main strong { font-size: clamp(1.75rem,3vw,2.65rem); font-weight: 650; line-height: 1.1; letter-spacing: -.055em; }
+.product-price del { color: var(--dim); font-size: .9rem; text-decoration-thickness: 1px; }
 .product-actions { display: flex; gap: 1rem; align-items: center; justify-content: space-between; }
 .cart-add { padding: .45rem .8rem; border: 1px solid var(--line); background: transparent; cursor: pointer; font-size: .72rem; }
 .product-buy { min-height: 44px; padding: .65rem 1rem; color: var(--ivory); background: var(--green); border-color: var(--green); }

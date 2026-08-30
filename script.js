@@ -62,7 +62,14 @@ const fallbackLabels = {
   outdoor: '든든한 밖의 시간'
 };
 const won = (value) => `${Number(value || 0).toLocaleString('ko-KR')}원`;
-const productCard = (product, featured = false) => `
+const productCard = (product, featured = false) => {
+  const discountRate = Number(product.discountRate || 0);
+  const salePrice = product.salePrice ?? product.price;
+  const hasDiscount = discountRate > 0 && Number(product.productPrice) > Number(salePrice);
+  const priceLabel = hasDiscount
+    ? `${discountRate}% 할인, 판매가 ${won(salePrice)}, 정상가 ${won(product.productPrice)}`
+    : `판매가 ${won(salePrice)}`;
+  return `
   <article class="product-card ${featured ? 'featured' : ''}">
     <a class="product-visual ${product.category}" href="${product.url}" target="_blank" rel="noopener" aria-label="${product.name} 쿠팡에서 보기">
       ${product.image ? `<img src="${product.image}" alt="${product.name}" loading="lazy">` : `<span>${fallbackLabels[product.category] || '일상을 위한 물건'}</span>`}
@@ -70,17 +77,17 @@ const productCard = (product, featured = false) => `
     </a>
     <div class="product-info">
       <p>${product.categoryLabel}</p><h3>${product.name}</h3>${product.option ? `<small class="product-option">${product.option}</small>` : ''}<span>${product.tagline}</span>
-      <dl class="product-price" aria-label="${product.name} 가격 정보">
-        <div><dt>제품가격</dt><dd>${won(product.productPrice)}</dd></div>
-        <div><dt>할인율</dt><dd class="discount-rate">${Number(product.discountRate || 0)}%</dd></div>
-        <div class="sale-price"><dt>판매가</dt><dd>${won(product.salePrice ?? product.price)}</dd></div>
-      </dl>
+      <div class="product-price" aria-label="${priceLabel}">
+        <div class="price-main">${hasDiscount ? `<span>${discountRate}%</span>` : ''}<strong>${won(salePrice)}</strong></div>
+        ${hasDiscount ? `<del>${won(product.productPrice)}</del>` : ''}
+      </div>
       <div class="product-actions">
         <a class="button product-buy" href="${product.url}" target="_blank" rel="noopener noreferrer">쿠팡에서 구매 <span aria-hidden="true">↗</span></a>
-        <button type="button" class="cart-add" data-cart-add data-name="${product.name}" data-price="${product.salePrice ?? product.price}" data-url="${product.url}">담기</button>
+        <button type="button" class="cart-add" data-cart-add data-name="${product.name}" data-price="${salePrice}" data-url="${product.url}">담기</button>
       </div>
     </div>
   </article>`;
+};
 
 async function renderProducts() {
   const containers = $$('[data-product-list]');
