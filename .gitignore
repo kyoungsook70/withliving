@@ -3,3 +3,5 @@ Thumbs.db
 assets/raw.mp4
 .playwright-cli/
 output/playwright/
+.vercel
+.env*
