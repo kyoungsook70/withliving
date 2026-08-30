@@ -1,12 +1,115 @@
-const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-$$('[data-year]').forEach(n=>n.textContent=new Date().getFullYear());
-const menu=$('.menu-toggle'),nav=$('#site-nav');
-if(menu&&nav){menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')==='true';menu.setAttribute('aria-expanded',String(!open));nav.classList.toggle('open',!open);document.body.classList.toggle('menu-open',!open)});$$('a',nav).forEach(a=>a.addEventListener('click',()=>{menu.setAttribute('aria-expanded','false');nav.classList.remove('open');document.body.classList.remove('menu-open')}))}
-const header=$('[data-header]'),updateHeader=()=>header?.classList.toggle('scrolled',scrollY>24);updateHeader();addEventListener('scroll',updateHeader,{passive:true});
-const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-if(!reduced&&'IntersectionObserver'in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.12});$$('.reveal').forEach(e=>io.observe(e))}else $$('.reveal').forEach(e=>e.classList.add('visible'));
-const labels={fabric:'포신한 직물의 감촉',organize:'정갈한 일상의 여백',outdoor:'든든한 밖의 시간'};
-const card=(p,featured=false)=>`<article class="product-card ${featured?'featured':''} reveal visible"><a class="product-visual ${p.category}" href="${p.url}" target="_blank" rel="noopener" aria-label="${p.name} 쿠팡에서 보기">${p.image?`<img src="${p.image}" alt="${p.name}" loading="lazy">`:`<span>${labels[p.category]||'일상을 위한 물건'}</span>`}<em>${p.categoryLabel}</em></a><div class="product-info"><p>${p.categoryLabel}</p><h3>${p.name}</h3><span>${p.tagline}</span><div class="product-actions"><a class="text-link" href="${p.url}" target="_blank" rel="noopener">쿠팡에서 가격 보기 <span aria-hidden="true">↗</span></a><button type="button" class="cart-add" data-cart-add data-name="${p.name}" data-price="0" data-url="${p.url}">담기</button></div></div></article>`;
-async function products(){const cs=$$('[data-product-list]');if(!cs.length)return;try{const r=await fetch('products.json');if(!r.ok)throw 0;const d=await r.json();cs.forEach(c=>{const list=c.dataset.category?d.products.filter(p=>p.category===c.dataset.category):d.products;c.innerHTML=list.slice(0,Number(c.dataset.limit||list.length)).map((p,i)=>card(p,i===0&&!c.dataset.category)).join('')})}catch{cs.forEach(c=>c.innerHTML='<p class="empty-note">제품을 준비하고 있어요.</p>')}}
-async function stories(){const cs=$$('[data-story-list]');if(!cs.length)return;try{const r=await fetch('story/posts.json');if(!r.ok)throw 0;const d=await r.json();cs.forEach(c=>c.innerHTML=d.slice(0,Number(c.dataset.limit||d.length)).map(p=>`<article class="story-card reveal visible"><p>${p.tags?.[0]||'LIVING NOTE'} · ${p.date}</p><h3><a href="story/${p.url||`post.html?id=${p.id}`}">${p.title}</a></h3><span>${p.summary}</span><a class="text-link" href="story/${p.url||`post.html?id=${p.id}`}">읽어보기 <span aria-hidden="true">→</span></a></article>`).join(''))}catch{cs.forEach(c=>c.innerHTML='<p class="empty-note">생활 이야기를 준비하고 있어요.</p>')}}
-products();stories();
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+$$('[data-year]').forEach((node) => { node.textContent = new Date().getFullYear(); });
+
+const menuButton = $('.menu-toggle');
+const siteNav = $('#site-nav');
+if (menuButton && siteNav) {
+  menuButton.addEventListener('click', () => {
+    const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!isOpen));
+    siteNav.classList.toggle('open', !isOpen);
+    document.body.classList.toggle('menu-open', !isOpen);
+  });
+  $$('a', siteNav).forEach((link) => link.addEventListener('click', () => {
+    menuButton.setAttribute('aria-expanded', 'false');
+    siteNav.classList.remove('open');
+    document.body.classList.remove('menu-open');
+  }));
+}
+
+const header = $('[data-header]');
+const syncHeader = () => header?.classList.toggle('scrolled', window.scrollY > 24);
+syncHeader();
+window.addEventListener('scroll', syncHeader, { passive: true });
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const counters = $$('[data-count]');
+function animateCounter(node) {
+  const target = Number(node.dataset.count || 0);
+  if (reducedMotion) { node.textContent = target; return; }
+  const started = performance.now();
+  const duration = 900;
+  function frame(now) {
+    const progress = Math.min((now - started) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    node.textContent = Math.round(target * eased);
+    if (progress < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+if (counters.length) {
+  if (reducedMotion) {
+    counters.forEach((counter) => { counter.textContent = counter.dataset.count; });
+  } else if ('IntersectionObserver' in window) {
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateCounter(entry.target);
+        counterObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.55 });
+    counters.forEach((counter) => counterObserver.observe(counter));
+  } else {
+    counters.forEach(animateCounter);
+  }
+}
+
+const fallbackLabels = {
+  fabric: '포신한 직물의 감촉',
+  organize: '정갈한 일상의 여백',
+  outdoor: '든든한 밖의 시간'
+};
+const productCard = (product, featured = false) => `
+  <article class="product-card ${featured ? 'featured' : ''}">
+    <a class="product-visual ${product.category}" href="${product.url}" target="_blank" rel="noopener" aria-label="${product.name} 쿠팡에서 보기">
+      ${product.image ? `<img src="${product.image}" alt="${product.name}" loading="lazy">` : `<span>${fallbackLabels[product.category] || '일상을 위한 물건'}</span>`}
+      <em>${product.categoryLabel}</em>
+    </a>
+    <div class="product-info">
+      <p>${product.categoryLabel}</p><h3>${product.name}</h3><span>${product.tagline}</span>
+      <div class="product-actions">
+        <a class="text-link" href="${product.url}" target="_blank" rel="noopener">쿠팡에서 가격 보기 <span aria-hidden="true">↗</span></a>
+        <button type="button" class="cart-add" data-cart-add data-name="${product.name}" data-price="0" data-url="${product.url}">담기</button>
+      </div>
+    </div>
+  </article>`;
+
+async function renderProducts() {
+  const containers = $$('[data-product-list]');
+  if (!containers.length) return;
+  try {
+    const response = await fetch('products.json');
+    if (!response.ok) throw new Error('products.json');
+    const { products } = await response.json();
+    containers.forEach((container) => {
+      const filtered = container.dataset.category ? products.filter((item) => item.category === container.dataset.category) : products;
+      const limit = Number(container.dataset.limit || filtered.length);
+      container.innerHTML = filtered.slice(0, limit).map((item, index) => productCard(item, index === 0 && !container.dataset.category)).join('');
+    });
+  } catch {
+    containers.forEach((container) => { container.innerHTML = '<p class="empty-note">제품을 준비하고 있어요.</p>'; });
+  }
+}
+
+async function renderStories() {
+  const containers = $$('[data-story-list]');
+  if (!containers.length) return;
+  try {
+    const response = await fetch('story/posts.json');
+    if (!response.ok) throw new Error('posts.json');
+    const posts = await response.json();
+    containers.forEach((container) => {
+      const limit = Number(container.dataset.limit || posts.length);
+      container.innerHTML = posts.slice(0, limit).map((post) => `
+        <article class="story-card"><p>${post.tags?.[0] || 'LIVING NOTE'} · ${post.date}</p>
+        <h3><a href="story/${post.url}">${post.title}</a></h3><span>${post.summary}</span>
+        <a class="text-link" href="story/${post.url}">읽어보기 <span aria-hidden="true">→</span></a></article>`).join('');
+    });
+  } catch {
+    containers.forEach((container) => { container.innerHTML = '<p class="empty-note">생활 이야기를 준비하고 있어요.</p>'; });
+  }
+}
+renderProducts();
+renderStories();
