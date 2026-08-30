@@ -8,6 +8,7 @@
   <title>위드리빙 | 일상에 따뜻함을 더하다</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assets/scrub.css">
   <link rel="stylesheet" href="assets/cart.css">
   <script src="script.js" defer></script>
   <script src="assets/cart.js" defer></script>
@@ -35,16 +36,20 @@
   </nav>
 
   <main id="main">
-    <section id="home" class="hero scroll-section" aria-labelledby="hero-title" data-scroll-section="home">
-      <img class="hero-image" src="assets/withliving-hero.png" alt="따뜻한 햇살이 드는 거실에 배치된 쿠션과 생활용품" onerror="this.hidden=true" data-hero-zoom>
-      <div class="hero-shade"></div>
-      <div class="hero-copy reveal">
-        <p class="eyebrow">WARM THINGS FOR EVERYDAY</p>
+    <section id="home" class="rd-scrub scroll-section" aria-labelledby="hero-title" data-scroll-section="home"
+             data-clip="assets/hero-scrub.mp4" data-clip-m="assets/hero-scrub-m.mp4"
+             data-poster="assets/hero-poster.jpg" data-poster-m="assets/hero-poster-m.jpg"
+             data-scroll="3" data-cue="SCROLL">
+      <div class="rd-scrub__band" data-a="0" data-b="0.45">
+        <span class="rd-scrub__kicker">WARM THINGS FOR EVERYDAY</span>
         <h1 id="hero-title">우리의 일상에<br>따뜻함을 더하다.</h1>
-        <p>쓸수록 편안하고, 둘수록 마음에 드는<br>생활의 물건을 위드리빙이 골라 소개합니다.</p>
-        <div class="hero-actions"><a class="button button-primary" href="#products">제품 둘러보기</a><a class="text-link light" href="#about">위드리빙 이야기 <span aria-hidden="true">↓</span></a></div>
+        <p>쓸수록 편안하고, 둘수록 마음에 드는</p>
       </div>
-      <p class="hero-note">아래로 내려 한 페이지에서 모두 만나보세요</p>
+      <div class="rd-scrub__band" data-a="0.5" data-b="1">
+        <h2>생활의 물건을<br>위드리빙이 골라 소개합니다.</h2>
+        <a class="rd-scrub__btn" href="#products">제품 둘러보기</a>
+        <a class="rd-scrub__btn rd-scrub__btn--ghost" href="#about">위드리빙 이야기</a>
+      </div>
     </section>
 
     <section id="about" class="scroll-section" data-scroll-section="about">
@@ -93,5 +98,6 @@
   </main>
 
   <footer class="site-footer"><div class="footer-brand"><strong>위드리빙</strong><span>WITH LIVING</span></div><div><p>일상에 따뜻함을 더하는 생활용품</p><p>© <span data-year></span> WITH LIVING. ALL RIGHTS RESERVED.</p></div><div class="footer-links"><a href="#products">제품</a><a href="story/">이야기</a><a href="#contact">연락하기</a></div></footer>
+  <script src="assets/scrub.js" defer></script>
 </body>
 </html>

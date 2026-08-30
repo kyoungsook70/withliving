@@ -6,17 +6,17 @@
    클래스가 전부 rd-scrub 로 시작해서 내 CSS 와 겹치지 않습니다.
    ========================================================================== */
 :root {
-  --scrub-ink:     #FFFFFF;                       /* 영상 위 글자색 */
-  --scrub-dim:     rgba(255,255,255,.72);         /* 보조 문장 · 킥커 */
-  --scrub-bg:      #2E2E2E;                       /* 영상 로드 전 바탕 · 스크림 색 */
-  --scrub-scrim:   .55;                           /* 어두운 막 세기 0(없음)~1 */
-  --scrub-font:    var(--font);                   /* 사이트 제목 서체 */
+  --scrub-ink:     #F6F1E7;                       /* 영상 위 글자색 */
+  --scrub-dim:     rgba(246,241,231,.78);         /* 보조 문장 · 킥커 */
+  --scrub-bg:      #1C1A17;                       /* 영상 로드 전 바탕 · 스크림 색 */
+  --scrub-scrim:   .42;                           /* 어두운 막 세기 0(없음)~1 */
+  --scrub-font:    var(--display);                /* 사이트 제목 서체 */
   --scrub-title:   clamp(52px, 8.5vw, 138px);     /* 제목 크기 */
-  --scrub-pad:     var(--page-x);                 /* 사이트 좌우 여백 */
+  --scrub-pad:     var(--pad);                    /* 사이트 좌우 여백 */
   --scrub-align:   left;                          /* left | center (문구 정렬) */
   --scrub-justify: start;                         /* start | center (문구 덩어리 위치) */
-  --scrub-accent:  #2F6FED;                       /* 버튼 바탕 */
-  --scrub-accent-ink: #FFFFFF;                    /* 버튼 글자 */
+  --scrub-accent:  #C0603C;                       /* 버튼 바탕 */
+  --scrub-accent-ink: #F6F1E7;                    /* 버튼 글자 */
 }
 
 .rd-scrub { position: relative; background: var(--scrub-bg); color: var(--scrub-ink); }
@@ -96,19 +96,20 @@
   :root { --scrub-title: clamp(48px, 14vw, 62px); }
   .rd-scrub__band { max-width: 100%; }
   .rd-scrub__copy { padding-bottom: 72px; }
+  .rd-scrub__cue { bottom: 72px; }
 }
 
 /* 첫 장면 위에서는 기존 헤더가 영상과 자연스럽게 겹칩니다. */
 .site-header { transition: background-color .25s ease, color .25s ease, border-color .25s ease; }
-.rd-scrub-at-hero .site-header { color: #FFFFFF; background: transparent; border-color: rgba(255,255,255,.28); }
+.rd-scrub-at-hero .site-header { color: #F6F1E7; background: transparent; border-color: rgba(246,241,231,.28); }
 .rd-scrub-at-hero .site-header .brand-logo { filter: brightness(0) invert(1); }
-.rd-scrub-at-hero .menu-toggle { color: #FFFFFF; }
-.rd-scrub-at-hero.menu-open .site-header { color: #2E2E2E; background: #FFFFFF; border-color: rgba(46,46,46,.18); }
+.rd-scrub-at-hero .menu-toggle { color: #F6F1E7; }
+.rd-scrub-at-hero.menu-open .site-header { color: #1C1A17; background: #F6F1E7; border-color: rgba(28,26,23,.18); }
 .rd-scrub-at-hero.menu-open .site-header .brand-logo { filter: none; }
-.rd-scrub-at-hero.menu-open .menu-toggle { color: #2E2E2E; }
+.rd-scrub-at-hero.menu-open .menu-toggle { color: #1C1A17; }
 
 @media (max-width: 600px) {
-  .rd-scrub-at-hero .site-nav { color: #2E2E2E; }
+  .rd-scrub-at-hero .site-nav { color: #1C1A17; }
 }
 @media (prefers-reduced-motion: reduce) {
   .rd-scrub__cue i { animation: none; }
