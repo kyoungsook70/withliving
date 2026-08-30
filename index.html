@@ -3,66 +3,94 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="방석부터 티슈케이스, 선반 매트까지 일상에 편안함과 따뜻함을 더하는 생활용품 브랜드 위드리빙입니다.">
+  <meta name="description" content="위드리빙의 브랜드 이야기와 엄선한 생활용품, 생활 노트, 문의 방법을 한 페이지에서 만나보세요.">
   <meta name="theme-color" content="#14352A">
   <title>위드리빙 | 일상에 따뜻함을 더하다</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=Noto+Sans+KR:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="assets/cart.css">
   <script src="script.js" defer></script>
   <script src="assets/cart.js" defer></script>
 </head>
-<body>
+<body class="one-page">
   <a class="skip-link" href="#main">본문으로 바로가기</a>
   <header class="site-header" data-header>
-    <a class="wordmark" href="index.html" aria-label="위드리빙 홈">위드리빙<small>WITH LIVING</small></a>
+    <a class="wordmark" href="#home" aria-label="위드리빙 홈">위드리빙<small>WITH LIVING</small></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">메뉴 열기</span></button>
     <nav id="site-nav" class="site-nav" aria-label="주요 메뉴">
-      <a class="active" href="index.html">홈</a><a href="about.html">내 소개</a><a href="products.html">제품</a><a href="story/index.html">이야기</a><a href="contact.html">연락하기</a>
+      <a href="#home" data-scroll-link="home">홈</a>
+      <a href="#about" data-scroll-link="about">내 소개</a>
+      <a href="#products" data-scroll-link="products">제품</a>
+      <a href="#story" data-scroll-link="story">이야기</a>
+      <a href="#contact" data-scroll-link="contact">연락하기</a>
     </nav>
   </header>
+
+  <nav class="section-rail" aria-label="페이지 현재 위치">
+    <a href="#home" data-scroll-link="home"><span>01</span>홈</a>
+    <a href="#about" data-scroll-link="about"><span>02</span>소개</a>
+    <a href="#products" data-scroll-link="products"><span>03</span>제품</a>
+    <a href="#story" data-scroll-link="story"><span>04</span>이야기</a>
+    <a href="#contact" data-scroll-link="contact"><span>05</span>연락</a>
+  </nav>
+
   <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
+    <section id="home" class="hero scroll-section" aria-labelledby="hero-title" data-scroll-section="home">
       <img class="hero-image" src="assets/withliving-hero.png" alt="따뜻한 햇살이 드는 거실에 배치된 쿠션과 생활용품" onerror="this.hidden=true" data-hero-zoom>
       <div class="hero-shade"></div>
       <div class="hero-copy reveal">
         <p class="eyebrow">WARM THINGS FOR EVERYDAY</p>
         <h1 id="hero-title">우리의 일상에<br>따뜻함을 더하다.</h1>
         <p>쓸수록 편안하고, 둘수록 마음에 드는<br>생활의 물건을 위드리빙이 골라 소개합니다.</p>
-        <div class="hero-actions"><a class="button button-primary" href="products.html">제품 둘러보기</a><a class="text-link light" href="about.html">위드리빙 이야기 <span aria-hidden="true">→</span></a></div>
+        <div class="hero-actions"><a class="button button-primary" href="#products">제품 둘러보기</a><a class="text-link light" href="#about">위드리빙 이야기 <span aria-hidden="true">↓</span></a></div>
       </div>
-      <p class="hero-note">일상을 다정하게 만드는 선택</p>
+      <p class="hero-note">아래로 내려 한 페이지에서 모두 만나보세요</p>
     </section>
-    <section class="numbers" aria-label="위드리빙 핵심 숫자">
-      <article><strong data-count="5">0</strong><span>일상을 채우는 제품군</span></article>
-      <article><strong data-count="3">0</strong><span>쓰임·어울림·정직함</span></article>
-      <article><strong data-count="1">0</strong><span>편안한 일상을 위한 선택</span></article>
-    </section>
-    <section class="intro section-pad reveal" aria-labelledby="intro-title">
-      <p class="section-number">01 · WITH LIVING</p>
-      <div><h2 id="intro-title">필요한 것을<br>더 다정하게.</h2><p>거창한 변화보다 매일 손이 가는 물건 하나가 생활을 편하게 만듭니다. 소재와 쓰임, 공간과의 어울림을 살펴 일상에 자연스럽게 스며드는 생활용품을 선보입니다.</p><a class="text-link" href="about.html">브랜드 소개 보기 <span aria-hidden="true">→</span></a></div>
-    </section>
-    <section class="collection section-pad" aria-labelledby="collection-title">
-      <div class="section-heading reveal"><div><p class="section-number">02 · CURATED GOODS</p><h2 id="collection-title">오늘의 생활을 위한 선택</h2></div><a class="text-link" href="products.html">전체 제품 <span aria-hidden="true">→</span></a></div>
-      <div class="home-products" data-product-list data-limit="3" aria-live="polite"></div>
-    </section>
-    <section class="categories section-pad" aria-labelledby="categories-title">
-      <div class="section-heading reveal"><div><p class="section-number">03 · FOR YOUR SPACE</p><h2 id="categories-title">생활의 장면마다</h2></div></div>
-      <div class="category-grid">
-        <a class="category-card reveal" href="products.html#fabric"><span>FABRIC</span><strong>쉬는 시간을 편안하게</strong><em>방석 · 쿠션 →</em></a>
-        <a class="category-card reveal" href="products.html#organize"><span>ORGANIZE</span><strong>눈에 보이는 곳을 정갈하게</strong><em>티슈케이스 · 선반 매트 →</em></a>
-        <a class="category-card reveal" href="products.html#outdoor"><span>OUTDOOR</span><strong>밖에서도 든든하게</strong><em>자전거 자물쇠 →</em></a>
+
+    <section id="about" class="scroll-section" data-scroll-section="about">
+      <div class="numbers" aria-label="위드리빙이 지키는 기준">
+        <article><strong data-count="2">0</strong><span>중국 현지와 한국 출고 전 검수</span></article>
+        <article><strong data-count="1">0</strong><span>선물을 받는 듯한 포장 원칙</span></article>
+        <article><strong data-count="5">0</strong><span>엄선해 소개하는 생활용품</span></article>
       </div>
+      <div class="founder-story section-pad">
+        <div class="founder-story__heading"><p class="section-number">01 · MY STORY</p><h2>받는 순간까지<br>좋은 쇼핑.</h2></div>
+        <div class="story-body">
+          <p>온라인으로 주문한 상품을 받아보고 오히려 마음이 상한 적이 있었습니다. 배송은 빨랐지만 여러 사람의 손을 탄 듯 포장은 흐트러져 있었고, 제품 상태도 깔끔하지 않았습니다.</p>
+          <p>그때 생각했습니다. 조금 느리더라도 가장 좋은 상태의 제품을 보내는 셀러가 되고 싶다고요. 상자를 여는 순간부터 기분 좋은 쇼핑이 시작되어야 한다고 믿었고, 그 마음으로 위드리빙을 시작했습니다.</p>
+        </div>
+      </div>
+      <blockquote class="founder-quote"><p>“평범한 주문도,<br>선물을 받는 순간처럼 닿았으면 합니다.”</p><cite>위드리빙을 시작한 마음</cite></blockquote>
+      <div class="founder-story founder-story--turning section-pad">
+        <figure class="story-photo"><img src="assets/withliving-hero.png" alt="쿠션과 생활용품이 놓인 따뜻하고 정갈한 공간" loading="lazy"><figcaption>물건이 놓이는 공간과, 물건을 받는 사람의 마음을 함께 생각합니다.</figcaption></figure>
+        <div class="story-body"><p class="section-number">THE TURNING POINT</p><h2>정성은 결국<br>전해졌습니다.</h2><p>정성껏 포장해 보낸 원목 티슈케이스가 망가진 채 반품되어 돌아왔을 때는 일을 그만두고 싶을 만큼 마음이 상했습니다.</p><p>그래도 “정성이 들어간 포장에 감동했다”는 한 고객의 리뷰가 다시 마음을 붙잡아 주었습니다. 제가 들인 시간이 누군가에게는 분명히 전해진다는 것을 알게 됐습니다.</p></div>
+      </div>
+      <div class="founder-promise"><p class="section-number">OUR PROMISE</p><h2>두 번 살피고,<br>끝까지 정성껏.</h2><p>추가 비용이 들더라도 중국 현지와 한국 출고 전에 두 번 검수하고, 가장 좋은 상태의 제품이 고객에게 닿도록 끝까지 정성껏 포장하겠습니다.</p><a class="button button-light" href="#products">제품 만나보기</a></div>
     </section>
-    <section class="story-preview section-pad" aria-labelledby="story-title">
-      <div class="section-heading reveal"><div><p class="section-number">04 · LIVING NOTES</p><h2 id="story-title">생활을 돕는 작은 이야기</h2></div><a class="text-link" href="story/index.html">이야기 전체 보기 <span aria-hidden="true">→</span></a></div>
+
+    <section id="products" class="collection section-pad scroll-section" aria-labelledby="collection-title" data-scroll-section="products">
+      <div class="section-heading reveal"><div><p class="section-number">02 · CURATED GOODS</p><h2 id="collection-title">많이 보여주기보다,<br>잘 고른 다섯 가지.</h2></div><p class="section-lead">제품가격과 할인은 한눈에,<br>구매는 쿠팡에서 안전하게.</p></div>
+      <div class="product-filter" aria-label="소개하는 제품군"><span>방석</span><span>티슈케이스</span><span>자전거 자물쇠</span></div>
+      <div class="products-grid" data-product-list data-limit="5" aria-live="polite"></div>
+      <div class="all-products-link"><a class="button" href="https://shop.coupang.com/23275" target="_blank" rel="noopener noreferrer">쿠팡에서 전체 제품 보기 <span aria-hidden="true">↗</span></a></div>
+      <p class="price-note">표시 가격은 2026년 8월 30일 수집 기준이며, 최종 가격과 재고는 쿠팡 구매 페이지에서 확인해주세요.</p>
+    </section>
+
+    <section id="story" class="story-preview section-pad scroll-section" aria-labelledby="story-title" data-scroll-section="story">
+      <div class="section-heading reveal"><div><p class="section-number">03 · LIVING NOTES</p><h2 id="story-title">생활을 돕는<br>작은 이야기</h2></div><p class="section-lead">물건을 고르고 관리하는 일이<br>조금 더 쉬워지도록 기록합니다.</p></div>
       <div class="story-grid" data-story-list data-limit="3"></div>
     </section>
-    <section class="cta-band reveal" aria-labelledby="cta-title"><p class="eyebrow">WITH LIVING, WITH YOU</p><h2 id="cta-title">당신의 일상에 필요한 것을<br>위드리빙에서 만나보세요.</h2><a class="button button-light" href="products.html">쿠팡 구매 제품 보기 <span aria-hidden="true">↗</span></a></section>
+
+    <section id="contact" class="contact-section scroll-section" data-scroll-section="contact">
+      <div class="contact-heading section-pad"><p class="section-number">04 · CONTACT</p><h2>궁금한 점을<br>편하게 남겨주세요.</h2><p>제품 선택과 구매, 입점과 협업에 관한 문의 채널을 준비하고 있습니다.</p></div>
+      <div class="contact-grid section-pad">
+        <article><span>PRODUCT &amp; ORDER</span><h2>제품과 주문</h2><p>제품의 결제와 재고 확인은 위드리빙 쿠팡 판매 페이지에서 진행됩니다.</p><a class="button" href="https://shop.coupang.com/23275" target="_blank" rel="noopener noreferrer">쿠팡 판매처 보기 ↗</a></article>
+        <article><span>EMAIL</span><h2>이메일 문의</h2><p>실제 문의용 이메일을 준비 중입니다. 연락처가 정해지면 이곳에 바로 연결하겠습니다.</p><span class="pending-label">연락처 준비 중</span></article>
+        <article><span>SOCIAL</span><h2>SNS</h2><p>신제품과 생활 팁을 전할 위드리빙 SNS 채널을 준비하고 있습니다.</p><span class="pending-label">SNS 준비 중</span></article>
+      </div>
+    </section>
   </main>
-  <footer class="site-footer"><div class="footer-brand"><strong>위드리빙</strong><span>WITH LIVING</span></div><div><p>일상에 따뜻함을 더하는 생활용품</p><p>© <span data-year></span> WITH LIVING. ALL RIGHTS RESERVED.</p></div><div class="footer-links"><a href="products.html">제품</a><a href="story/index.html">이야기</a><a href="contact.html">연락하기</a></div></footer>
+
+  <footer class="site-footer"><div class="footer-brand"><strong>위드리빙</strong><span>WITH LIVING</span></div><div><p>일상에 따뜻함을 더하는 생활용품</p><p>© <span data-year></span> WITH LIVING. ALL RIGHTS RESERVED.</p></div><div class="footer-links"><a href="#products">제품</a><a href="#story">이야기</a><a href="#contact">연락하기</a></div></footer>
 </body>
 </html>

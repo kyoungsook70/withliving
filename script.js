@@ -24,6 +24,36 @@ const syncHeader = () => header?.classList.toggle('scrolled', window.scrollY > 2
 syncHeader();
 window.addEventListener('scroll', syncHeader, { passive: true });
 
+const scrollSections = $$('[data-scroll-section]');
+const scrollLinks = $$('[data-scroll-link]');
+let scrollSectionFrame = 0;
+function syncCurrentSection() {
+  scrollSectionFrame = 0;
+  if (!scrollSections.length || !scrollLinks.length) return;
+  const marker = Math.min(window.innerHeight * .42, 420);
+  let current = scrollSections[0].dataset.scrollSection;
+  scrollSections.forEach((section) => {
+    if (section.getBoundingClientRect().top <= marker) current = section.dataset.scrollSection;
+  });
+  if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8) {
+    current = scrollSections[scrollSections.length - 1].dataset.scrollSection;
+  }
+  document.body.dataset.currentSection = current;
+  scrollLinks.forEach((link) => {
+    const isCurrent = link.dataset.scrollLink === current;
+    link.classList.toggle('is-current', isCurrent);
+    if (isCurrent) link.setAttribute('aria-current', 'location');
+    else link.removeAttribute('aria-current');
+  });
+}
+function requestSectionSync() {
+  if (scrollSectionFrame) return;
+  scrollSectionFrame = requestAnimationFrame(syncCurrentSection);
+}
+syncCurrentSection();
+window.addEventListener('scroll', requestSectionSync, { passive: true });
+window.addEventListener('resize', requestSectionSync);
+
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const counters = $$('[data-count]');
 function animateCounter(node) {
