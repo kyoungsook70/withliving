@@ -1,6 +1,7 @@
 .DS_Store
 Thumbs.db
 assets/raw.mp4
+assets/raw01.mp4
 .playwright-cli/
 output/playwright/
 .vercel
