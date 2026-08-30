@@ -8,12 +8,12 @@
   <meta name="author" content="">
   <meta name="theme-color" content="#1C1A17">
   <title>블로그 글 보기 | 위드리빙</title>
-  <link rel="canonical" href="https://withliving.kr/story/">
+  <link rel="canonical" href="https://www.withliving.kr/story/">
   <meta property="og:type" content="article">
   <meta property="og:title" content="블로그 글 보기 | 위드리빙">
   <meta property="og:description" content="위드리빙 생활용품 이야기">
-  <meta property="og:url" content="https://withliving.kr/story/">
-  <meta property="og:image" content="https://withliving.kr/og.png">
+  <meta property="og:url" content="https://www.withliving.kr/story/">
+  <meta property="og:image" content="https://www.withliving.kr/og.png">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../styles.css">
   <script src="../script.js" defer></script>
@@ -79,7 +79,7 @@
     const setMeta = (post) => {
       const title = String(post.title || '이야기');
       const description = String(post.description || post.summary || '').slice(0, 160);
-      const canonical = 'https://withliving.kr/story/post.html?id=' + encodeURIComponent(String(post.id || ''));
+      const canonical = 'https://www.withliving.kr/story/post.html?id=' + encodeURIComponent(String(post.id || ''));
       document.title = title + ' | 위드리빙';
       document.querySelector('meta[name="description"]').content = description;
       document.querySelector('meta[name="author"]').content = String(post.author || '');
