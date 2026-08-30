@@ -54,37 +54,8 @@ syncCurrentSection();
 window.addEventListener('scroll', requestSectionSync, { passive: true });
 window.addEventListener('resize', requestSectionSync);
 
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const counters = $$('[data-count]');
-function animateCounter(node) {
-  const target = Number(node.dataset.count || 0);
-  if (reducedMotion) { node.textContent = target; return; }
-  const started = performance.now();
-  const duration = 900;
-  function frame(now) {
-    const progress = Math.min((now - started) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    node.textContent = Math.round(target * eased);
-    if (progress < 1) requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-if (counters.length) {
-  if (reducedMotion) {
-    counters.forEach((counter) => { counter.textContent = counter.dataset.count; });
-  } else if ('IntersectionObserver' in window) {
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        animateCounter(entry.target);
-        counterObserver.unobserve(entry.target);
-      });
-    }, { threshold: 0.55 });
-    counters.forEach((counter) => counterObserver.observe(counter));
-  } else {
-    counters.forEach(animateCounter);
-  }
-}
+counters.forEach((counter) => { counter.textContent = counter.dataset.count; });
 
 const fallbackLabels = {
   fabric: '포신한 직물의 감촉',

@@ -6,12 +6,12 @@
      클래스 이름은 전부 rdcart- 로 시작해서 내 사이트 CSS 와 겹치지 않습니다.
    ========================================================================== */
 :root {
-  --cart-bg:     #FBF8F0;
-  --cart-ink:    #14352A;
-  --cart-line:   rgba(41, 38, 33, .17);
-  --cart-accent: #7A674D;
+  --cart-bg:     #F6F1E7;
+  --cart-ink:    #1C1A17;
+  --cart-line:   rgba(28, 26, 23, .17);
+  --cart-accent: #C0603C;
   --cart-radius: 0;
-  --cart-font:   "Noto Sans KR", Arial, sans-serif;
+  --cart-font:   "Pretendard Variable", Pretendard, Arial, sans-serif;
 }
 
 /* ───────── 열렸을 때 배경 스크롤 잠금 ───────── */
@@ -29,7 +29,7 @@ html.rdcart-locked, body.rdcart-locked { overflow: hidden; }
 }
 .rdcart-btn--float {
   position: fixed; top: 94px; right: 20px; z-index: 90;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+  box-shadow: 0 6px 20px rgba(28, 26, 23, .18);
 }
 .rdcart-btn:active { transform: translateY(0); }
 @media (hover: hover) { .rdcart-btn:hover { transform: translateY(-1px); } }
@@ -63,7 +63,7 @@ html.rdcart-locked, body.rdcart-locked { overflow: hidden; }
 
 .rdcart__back {
   position: absolute; inset: 0;
-  background: rgba(20, 18, 16, .48);
+  background: rgba(28, 26, 23, .48);
   opacity: 0; transition: opacity .32s ease;
 }
 .rdcart--open .rdcart__back { opacity: 1; }
@@ -73,7 +73,7 @@ html.rdcart-locked, body.rdcart-locked { overflow: hidden; }
   height: 100%; width: min(400px, 92vw);
   display: flex; flex-direction: column;
   background: var(--cart-bg);
-  box-shadow: -18px 0 54px rgba(20, 18, 16, .2);
+  box-shadow: -18px 0 54px rgba(28, 26, 23, .2);
   transform: translateX(100%);
   transition: transform .38s cubic-bezier(.2, .8, .3, 1);
 }
