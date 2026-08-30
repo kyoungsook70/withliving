@@ -101,10 +101,9 @@ const productCard = (product, featured = false) => {
     : `판매가 ${won(salePrice)}`;
   return `
   <article class="product-card ${featured ? 'featured' : ''}">
-    <a class="product-visual ${product.category}" href="${product.url}" target="_blank" rel="noopener" aria-label="${product.name} 쿠팡에서 보기">
+    <div class="product-visual ${product.category}">
       ${product.image ? `<img src="${product.image}" alt="${product.name}" loading="lazy">` : `<span>${fallbackLabels[product.category] || '일상을 위한 물건'}</span>`}
-      <em>${product.categoryLabel}</em>
-    </a>
+    </div>
     <div class="product-info">
       <p>${product.categoryLabel}</p><h3>${product.name}</h3>${product.option ? `<small class="product-option">${product.option}</small>` : ''}<span>${product.tagline}</span>
       <div class="product-price" aria-label="${priceLabel}">
