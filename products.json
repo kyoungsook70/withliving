@@ -1,7 +1,81 @@
-{"products":[
-  {"id":"daily-seat-cushion","name":"데일리 시트 방석","category":"fabric","categoryLabel":"FABRIC","tagline":"오래 앉아 있는 시간을 더 편안하게","price":null,"image":"","featured":true,"url":"https://www.coupang.com/"},
-  {"id":"soft-cushion","name":"소프트 데일리 쿠션","category":"fabric","categoryLabel":"FABRIC","tagline":"쉬고 싶은 순간, 포신함을 하나 더","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"},
-  {"id":"calm-tissue-case","name":"캄 티슈케이스","category":"organize","categoryLabel":"ORGANIZE","tagline":"자주 보는 생활품도 공간에 자연스럽게","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"},
-  {"id":"safe-bike-lock","name":"데일리 자전거 자물쇠","category":"outdoor","categoryLabel":"OUTDOOR","tagline":"잠시 멈추는 순간에도 든든하게","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"},
-  {"id":"clean-shelf-mat","name":"클린 선반 매트","category":"organize","categoryLabel":"ORGANIZE","tagline":"서랍과 선반을 매일 깔끔하게","price":null,"image":"","featured":false,"url":"https://www.coupang.com/"}
-]}
+{
+  "storeUrl": "https://shop.coupang.com/23275",
+  "collectedAt": "2026-08-30",
+  "products": [
+    {
+      "id": "memory-foam-donut-cushion",
+      "name": "위드리빙 메모리폼 도넛방석",
+      "option": "핑크 · 1개",
+      "category": "fabric",
+      "categoryLabel": "방석",
+      "tagline": "오래 앉아 있는 자리의 부담을 덜어주는",
+      "productPrice": 25500,
+      "discountRate": 31,
+      "salePrice": 17380,
+      "price": 17380,
+      "image": "https://thumbnail10.coupangcdn.com/thumbnails/remote/230x230ex/image/vendor_inventory/316d/b15e0898980cad156e579eda1c1796b39a52f9c14424e1c17c0e37cb0e90.png",
+      "featured": true,
+      "url": "https://www.coupang.com/vp/products/8748292187?itemId=10543968760&searchId=2f160b6f87434dfbb9aa13d12638af4b&sourceType=brandstore_sdp_atf-all_products&storeId=23275&subSourceType=brandstore_sdp_atf-all_products&vendorId=A00660192&vendorItemId=82194596940"
+    },
+    {
+      "id": "memory-foam-office-seat-cushion",
+      "name": "위드리빙 메모리폼 사무실 의자방석",
+      "option": "네이비",
+      "category": "fabric",
+      "categoryLabel": "방석",
+      "tagline": "사무실과 차 안, 매일 앉는 자리에",
+      "productPrice": 22700,
+      "discountRate": 0,
+      "salePrice": 22700,
+      "price": 22700,
+      "image": "https://thumbnail7.coupangcdn.com/thumbnails/remote/230x230ex/image/vendor_inventory/86f8/9430b727bb7f079abafdeef764e2a3517b8208bebf2bad3eab29422c293e.png",
+      "featured": false,
+      "url": "https://www.coupang.com/vp/products/9544686962?itemId=28474258987&searchId=2f160b6f87434dfbb9aa13d12638af4b&sourceType=brandstore_sdp_atf-all_products&storeId=23275&subSourceType=brandstore_sdp_atf-all_products&vendorId=A00660192&vendorItemId=95423129312"
+    },
+    {
+      "id": "tissue-case-wipes-set",
+      "name": "위드리빙 각티슈케이스 + 소독티슈 3개 세트",
+      "option": "화이트골드 · 1개",
+      "category": "organize",
+      "categoryLabel": "티슈케이스",
+      "tagline": "생활감 있는 각티슈를 정갈하게",
+      "productPrice": 14500,
+      "discountRate": 0,
+      "salePrice": 14500,
+      "price": 14500,
+      "image": "https://thumbnail8.coupangcdn.com/thumbnails/remote/230x230ex/image/vendor_inventory/4cc2/9b62ec475be612f8468524465023a816ece15698a50bf77249911e4ebf37.jpg",
+      "featured": false,
+      "url": "https://www.coupang.com/vp/products/6839776954?itemId=16261181762&searchId=65bca5883dc2473fae699654dfae578f&sourceType=brandstore_sdp_atf-all_products&storeId=23275&subSourceType=brandstore_sdp_atf-all_products&vendorId=A00660192&vendorItemId=83454706931"
+    },
+    {
+      "id": "wire-rope-combination-lock",
+      "name": "위드리빙 와이어 로프 맹꽁이 자물쇠 DB201-60",
+      "option": "1개",
+      "category": "outdoor",
+      "categoryLabel": "자전거 자물쇠",
+      "tagline": "자전거와 짐을 잠시 맡겨둘 때",
+      "productPrice": 8900,
+      "discountRate": 0,
+      "salePrice": 8900,
+      "price": 8900,
+      "image": "https://thumbnail.coupangcdn.com/thumbnails/remote/492x492ex/image/retail/images/861943235009538-fccbbdef-6cb3-4a16-b7fc-ddf7dd17c6ac.jpg",
+      "featured": false,
+      "url": "https://www.coupang.com/vp/products/7720771095?itemId=20720564279&searchId=72c94018c3704fb7900b24f8f94a66b6&sourceType=brandstore_sdp_atf-all_products&storeId=23275&subSourceType=brandstore_sdp_atf-all_products&vendorId=A00660192&vendorItemId=91832177562"
+    },
+    {
+      "id": "vintage-leather-roll-tissue-case",
+      "name": "위드리빙 빈티지 가죽 원통 티슈케이스",
+      "option": "홈 · 1개",
+      "category": "organize",
+      "categoryLabel": "티슈케이스",
+      "tagline": "굴러다니는 롤휴지를 차분하게",
+      "productPrice": 15900,
+      "discountRate": 6,
+      "salePrice": 14900,
+      "price": 14900,
+      "image": "https://thumbnail9.coupangcdn.com/thumbnails/remote/230x230ex/image/vendor_inventory/6e7c/54adf8254e1d9bf956c779c86875c291042d2266bd415da241f959147164.jpg",
+      "featured": false,
+      "url": "https://www.coupang.com/vp/products/5789613676?itemId=9893191407&searchId=112f4d6e669c44dcaad66fc3c5a7fa2c&sourceType=brandstore_sdp_atf-all_products&storeId=23275&subSourceType=brandstore_sdp_atf-all_products&vendorId=A00660192&vendorItemId=83471512910"
+    }
+  ]
+}

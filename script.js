@@ -61,6 +61,7 @@ const fallbackLabels = {
   organize: '정갈한 일상의 여백',
   outdoor: '든든한 밖의 시간'
 };
+const won = (value) => `${Number(value || 0).toLocaleString('ko-KR')}원`;
 const productCard = (product, featured = false) => `
   <article class="product-card ${featured ? 'featured' : ''}">
     <a class="product-visual ${product.category}" href="${product.url}" target="_blank" rel="noopener" aria-label="${product.name} 쿠팡에서 보기">
@@ -68,10 +69,15 @@ const productCard = (product, featured = false) => `
       <em>${product.categoryLabel}</em>
     </a>
     <div class="product-info">
-      <p>${product.categoryLabel}</p><h3>${product.name}</h3><span>${product.tagline}</span>
+      <p>${product.categoryLabel}</p><h3>${product.name}</h3>${product.option ? `<small class="product-option">${product.option}</small>` : ''}<span>${product.tagline}</span>
+      <dl class="product-price" aria-label="${product.name} 가격 정보">
+        <div><dt>제품가격</dt><dd>${won(product.productPrice)}</dd></div>
+        <div><dt>할인율</dt><dd class="discount-rate">${Number(product.discountRate || 0)}%</dd></div>
+        <div class="sale-price"><dt>판매가</dt><dd>${won(product.salePrice ?? product.price)}</dd></div>
+      </dl>
       <div class="product-actions">
-        <a class="text-link" href="${product.url}" target="_blank" rel="noopener">쿠팡에서 가격 보기 <span aria-hidden="true">↗</span></a>
-        <button type="button" class="cart-add" data-cart-add data-name="${product.name}" data-price="0" data-url="${product.url}">담기</button>
+        <a class="button product-buy" href="${product.url}" target="_blank" rel="noopener noreferrer">쿠팡에서 구매 <span aria-hidden="true">↗</span></a>
+        <button type="button" class="cart-add" data-cart-add data-name="${product.name}" data-price="${product.salePrice ?? product.price}" data-url="${product.url}">담기</button>
       </div>
     </div>
   </article>`;
@@ -86,7 +92,8 @@ async function renderProducts() {
     containers.forEach((container) => {
       const filtered = container.dataset.category ? products.filter((item) => item.category === container.dataset.category) : products;
       const limit = Number(container.dataset.limit || filtered.length);
-      container.innerHTML = filtered.slice(0, limit).map((item, index) => productCard(item, index === 0 && !container.dataset.category)).join('');
+      const curated = filtered.slice(0, limit);
+      container.innerHTML = curated.map((item, index) => productCard(item, index === 0 && !container.dataset.category)).join('');
     });
   } catch {
     containers.forEach((container) => { container.innerHTML = '<p class="empty-note">제품을 준비하고 있어요.</p>'; });
