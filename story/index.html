@@ -1,4 +1,90 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="생활용품을 고르고 관리하는 방법을 나누는 위드리빙의 리빙 노트입니다."><title>이야기 | 위드리빙</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=Noto+Sans+KR:wght@300;400;500;600&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="../styles.css"><script src="../script.js" defer></script></head><body>
-<a class="skip-link" href="#main">본문으로 바로가기</a><header class="site-header inner" data-header><a class="wordmark" href="../index.html">위드리빙<small>WITH LIVING</small></a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">메뉴 열기</span></button><nav id="site-nav" class="site-nav"><a href="../index.html#home">홈</a><a href="../index.html#about">내 소개</a><a href="../index.html#products">제품</a><a href="../index.html#story">이야기</a><a href="../index.html#contact">연락하기</a></nav></header>
-<main id="main"><section class="page-hero"><p class="section-number">LIVING NOTES</p><h1>생활을 돕는<br>작은 이야기.</h1><p>물건을 고르고 관리하는 일이 좀 더 쉬워지도록, 일상에서 쓸모 있는 정보를 차근차근 기록합니다.</p></section><section class="story-index section-pad"><div class="story-list"><article><p>쿠션 관리 · 2026.08.30</p><h2><a href="cushion-care.html">방석과 쿠션은 어떻게 관리해야 오래 쓸까요?</a></h2><span>소재별 세탁 표시를 먼저 보고, 평소에는 통풍과 가벼운 털어내기로 관리하는 방법.</span></article><article><p>선반 매트 · 2026.08.30</p><h2><a href="shelf-mat-size.html">선반 매트 크기는 어떻게 측정하면 될까요?</a></h2><span>안쪽 폭과 깊이를 각각 재고 모서리 여유를 확인하는 순서.</span></article><article><p>티슈케이스 · 2026.08.30</p><h2><a href="tissue-case-choice.html">티슈케이스를 고를 때 무엇을 먼저 볼까요?</a></h2><span>티슈 크기와 교체 방식, 두는 장소를 기준으로 고르는 방법.</span></article></div></section></main>
-<footer class="site-footer"><div class="footer-brand"><strong>위드리빙</strong><span>WITH LIVING</span></div><div><p>일상에 따뜻함을 더하는 생활용품</p><p>© <span data-year></span> WITH LIVING.</p></div><div class="footer-links"><a href="../products.html">제품</a><a href="../contact.html">연락하기</a></div></footer></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="생활용품을 고르고 관리하는 방법과 위드리빙이 물건을 고르는 기준을 기록합니다.">
+  <meta name="theme-color" content="#1C1A17">
+  <title>이야기 | 위드리빙</title>
+  <link rel="canonical" href="https://withliving.kr/story/">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 바로가기</a>
+  <header class="site-header inner" data-header>
+    <a class="wordmark" href="../index.html#home" aria-label="위드리빙 홈">위드리빙<small>WITH LIVING</small></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">메뉴 열기</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="주요 메뉴">
+      <a href="../index.html#home">홈</a>
+      <a href="../index.html#about">내 소개</a>
+      <a href="../index.html#products">제품</a>
+      <a class="active" aria-current="page" href="./">이야기</a>
+      <a href="../index.html#contact">연락하기</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="page-hero story-page-hero">
+      <p class="section-number">LIVING NOTES</p>
+      <h1>생활을 돕는<br>작은 이야기.</h1>
+      <p>물건을 고르고 관리하는 일이 조금 더 쉬워지도록,<br>일상에서 쓸모 있는 정보를 차근차근 기록합니다.</p>
+    </section>
+    <section class="story-index section-pad" aria-labelledby="story-list-title">
+      <h2 id="story-list-title" class="sr-only">위드리빙 이야기 목록</h2>
+      <div class="story-list" id="story-list" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand"><strong>위드리빙</strong><span>WITH LIVING</span></div>
+    <div><p>일상에 따뜻함을 더하는 생활용품</p><p>© <span data-year></span> WITH LIVING. ALL RIGHTS RESERVED.</p></div>
+    <div class="footer-links"><a href="../index.html#products">제품</a><a aria-current="page" href="./">이야기</a><a href="../index.html#contact">연락하기</a></div>
+  </footer>
+
+  <script>
+  (function () {
+    const list = document.getElementById('story-list');
+    const formatDate = (value) => {
+      const date = new Date(String(value || '') + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return String(value || '');
+      return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    };
+    const make = (tag, className, text) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    };
+    fetch('posts.json', { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.json();
+      })
+      .then((posts) => {
+        const sorted = (Array.isArray(posts) ? posts : []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+        if (!sorted.length) {
+          list.appendChild(make('p', 'empty-note', '첫 번째 이야기를 준비하고 있어요.'));
+          return;
+        }
+        sorted.forEach((post) => {
+          const article = make('article');
+          const date = make('p', null, formatDate(post.date));
+          const title = make('h2');
+          const link = make('a', null, String(post.title || '(제목 없음)'));
+          link.href = post.url ? String(post.url) : 'post.html?id=' + encodeURIComponent(String(post.id || ''));
+          title.appendChild(link);
+          article.appendChild(date);
+          article.appendChild(title);
+          if (post.summary) article.appendChild(make('span', null, String(post.summary)));
+          list.appendChild(article);
+        });
+      })
+      .catch(() => {
+        list.appendChild(make('p', 'empty-note', '글 목록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.'));
+      });
+  }());
+  </script>
+</body>
+</html>

@@ -1,34 +1,28 @@
-# NEXGEN
+# 위드리빙
 
-> NEXGEN은 하이브리드 재조합 단백질 연구에서 출발한 기능성 스킨케어 브랜드입니다. BEAUTY MEETS SCIENCE는 브랜드 슬로건입니다.
+> 위드리빙은 검수와 정성스러운 포장을 중요하게 생각하며, 일상에 필요한 생활용품을 골라 소개하는 브랜드입니다.
 
 ## 판매 제품
 
-- NEXGEN 기능성화장품: 앰플, 세럼, 크림, 미스트, 오일, 마스크팩과 두피 관리 제품
-- [NEXGEN 스마트스토어](https://smartstore.naver.com/withnexgen): 현재 제품명, 가격, 구매 정보 확인
+- 방석, 쿠션, 티슈케이스, 자전거 자물쇠, 미니가습기 등 생활용품
+- [위드리빙 제품](https://withliving.kr/products.html): 대표 제품과 추천 제품, 쿠팡 구매 링크
 
 ## 주요 페이지
 
-- [홈](https://www.nexgencosmetics.kr/): 브랜드, 대표 제품, 최신 이야기
-- [내 소개](https://www.nexgencosmetics.kr/about.html): 넥스젠화장품 이경숙원장의 시작과 약속
-- [제품](https://www.nexgencosmetics.kr/products.html): 판매 중인 NEXGEN 제품과 구매 링크
-- [이야기](https://www.nexgencosmetics.kr/story/): 피부와 제품을 바라보는 기준
-- [연락하기](https://www.nexgencosmetics.kr/contact.html): 이메일, 인스타그램, 스마트스토어 공식 채널
+- [홈](https://withliving.kr/): 브랜드 이야기, 대표 제품, 최신 이야기
+- [내 소개](https://withliving.kr/about.html): 위드리빙을 시작한 이유와 검수·포장 약속
+- [제품](https://withliving.kr/products.html): 위드리빙이 골라 소개하는 생활용품
+- [이야기](https://withliving.kr/story/): 생활용품을 고르고 관리하는 방법
+- [연락하기](https://withliving.kr/contact.html): 제품 구매와 문의 안내
 
 ## 이야기(블로그)
 
-- [거미독·전갈독 화장품 원료는 동물에서 직접 추출하나요?](https://www.nexgencosmetics.kr/story/venom-protein-source.html): 직접 추출이 아닌 재조합 단백질 생산 원리
-- [하이브리드 단백질은 무엇이며 어떻게 만드나요?](https://www.nexgencosmetics.kr/story/what-is-hybrid-protein.html): 서로 다른 유전정보를 연결해 하나의 단백질로 만드는 과정
-- [하이브리드 단백질 화장품 원료는 어떤 기능을 하나요?](https://www.nexgencosmetics.kr/story/hybrid-protein-functions.html): 원료 시험과 완제품 기능성 표시를 구분하는 기준
-- [EGF 100ppm 원료 가격은 왜 비싸고 어떻게 낮출 수 있나요?](https://www.nexgencosmetics.kr/story/egf-raw-material-price.html): 생산 공정 개선과 공개된 공급 가격, 원료 확인 기준
-- [EGF 화장품은 순도보다 안정성이 더 중요한가요?](https://www.nexgencosmetics.kr/story/egf-purity-vs-stability.html): 10ppm의 의미와 순도·안정성을 함께 보는 이유
-- [기술 장벽이 높은 화장품은 왜 개발에 오래 걸리나요?](https://www.nexgencosmetics.kr/story/high-tech-cosmetic-development.html): 원료부터 완제품 검증까지 시간이 필요한 이유
-- [겨울철 EGF 재생크림은 어떻게 보관하나요?](https://www.nexgencosmetics.kr/story/winter-egf-cream-storage.html): 온도 변화가 적은 실내 보관 기준
-- [무향 화장품은 왜 처음 사용하기 어려웠나요?](https://www.nexgencosmetics.kr/story/fragrance-free-first-challenge.html): 원료 고유의 향을 설명하며 배운 점
-- [넥스젠 EGF 재생크림은 무엇이 다른가요?](https://www.nexgencosmetics.kr/story/nexgen-egf-cream-difference.html): 원료 연구에서 출발한 제조사와 셀러의 기준
+- [방석과 쿠션은 어떻게 관리해야 오래 쓸까요?](https://withliving.kr/story/cushion-care.html): 세탁 표시와 통풍을 먼저 확인하는 쿠션 관리 방법
+- [선반 매트 크기는 어떻게 측정하면 될까요?](https://withliving.kr/story/shelf-mat-size.html): 선반 안쪽 폭과 깊이를 재는 순서
+- [티슈케이스를 고를 때 무엇을 먼저 볼까요?](https://withliving.kr/story/tissue-case-choice.html): 티슈 크기와 교체 방식, 두는 장소를 확인하는 기준
 
 ## 편집 기준
 
-- 작성자: 이경숙 · 넥스젠화장품 대표
-- 고객이 확인할 수 있는 사실과 개인 경험을 구분합니다.
-- 과장된 순위, 근거 없는 효능·수치, 지어낸 후기를 사용하지 않습니다.
+- 작성자: 위드리빙
+- 화면에 없는 수치·효능·후기나 과장된 순위 표현을 추가하지 않습니다.
+- 제품 가격과 재고는 연결된 쿠팡 구매 페이지에서 최종 확인합니다.

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /story/admin.html
 
-Sitemap: https://www.nexgencosmetics.kr/sitemap.xml
+Sitemap: https://withliving.kr/sitemap.xml

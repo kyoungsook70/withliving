@@ -1,1 +1,180 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=index.html"><title>이야기 | 위드리빙</title></head><body><p><a href="index.html">이야기 목록으로 이동</a></p></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="위드리빙 이야기">
+  <meta name="author" content="">
+  <meta name="theme-color" content="#1C1A17">
+  <title>이야기 | 위드리빙</title>
+  <link rel="canonical" href="https://withliving.kr/story/post.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="이야기 | 위드리빙">
+  <meta property="og:description" content="위드리빙 이야기">
+  <meta property="og:url" content="https://withliving.kr/story/post.html">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 바로가기</a>
+  <header class="site-header inner" data-header>
+    <a class="wordmark" href="../index.html#home" aria-label="위드리빙 홈">위드리빙<small>WITH LIVING</small></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr-only">메뉴 열기</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="주요 메뉴">
+      <a href="../index.html#home">홈</a>
+      <a href="../index.html#about">내 소개</a>
+      <a href="../index.html#products">제품</a>
+      <a class="active" aria-current="page" href="./">이야기</a>
+      <a href="../index.html#contact">연락하기</a>
+    </nav>
+  </header>
+
+  <main id="main" class="article story-article">
+    <a class="back-link" href="./">← 이야기 목록</a>
+    <div id="post-root" aria-live="polite"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand"><strong>위드리빙</strong><span>WITH LIVING</span></div>
+    <div><p>일상에 따뜻함을 더하는 생활용품</p><p>© <span data-year></span> WITH LIVING. ALL RIGHTS RESERVED.</p></div>
+    <div class="footer-links"><a href="../index.html#products">제품</a><a aria-current="page" href="./">이야기</a><a href="../index.html#contact">연락하기</a></div>
+  </footer>
+
+  <script>
+  (function () {
+    const root = document.getElementById('post-root');
+    const make = (tag, className, text) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    };
+    const formatDate = (value) => {
+      const date = new Date(String(value || '') + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return String(value || '');
+      return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    };
+    const hrefOf = (post) => post.url ? String(post.url) : 'post.html?id=' + encodeURIComponent(String(post.id || ''));
+    const renderBody = (source) => {
+      const body = make('div', 'post-body');
+      String(source || '').replace(/\r\n/g, '\n').split(/\n\s*\n/).forEach((block) => {
+        const value = block.trim();
+        if (!value) return;
+        const lines = value.split('\n');
+        if (lines.every((line) => /^- /.test(line.trim()))) {
+          const list = make('ul');
+          lines.forEach((line) => list.appendChild(make('li', null, line.trim().slice(2))));
+          body.appendChild(list);
+        } else if (/^## /.test(value)) {
+          body.appendChild(make('h2', null, value.slice(3).trim()));
+        } else {
+          body.appendChild(make('p', null, value));
+        }
+      });
+      return body;
+    };
+    const setMeta = (post) => {
+      const title = String(post.title || '이야기');
+      const description = String(post.description || post.summary || '').slice(0, 160);
+      const canonical = 'https://withliving.kr/story/post.html?id=' + encodeURIComponent(String(post.id || ''));
+      document.title = title + ' | 위드리빙';
+      document.querySelector('meta[name="description"]').content = description;
+      document.querySelector('meta[name="author"]').content = String(post.author || '');
+      document.querySelector('link[rel="canonical"]').href = canonical;
+      document.querySelector('meta[property="og:title"]').content = title;
+      document.querySelector('meta[property="og:description"]').content = description;
+      document.querySelector('meta[property="og:url"]').content = canonical;
+    };
+    const notFound = () => {
+      const box = make('div', 'notfound');
+      box.appendChild(make('h1', null, '글을 찾을 수 없습니다'));
+      box.appendChild(make('p', null, '주소가 잘못되었거나 삭제된 글일 수 있어요.'));
+      const link = make('a', 'text-link', '이야기 목록으로 돌아가기');
+      link.href = './';
+      box.appendChild(link);
+      root.appendChild(box);
+    };
+    fetch('posts.json', { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.json();
+      })
+      .then((posts) => {
+        const sorted = (Array.isArray(posts) ? posts : []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+        const id = new URLSearchParams(location.search).get('id') || new URLSearchParams(location.search).get('slug');
+        const index = sorted.findIndex((post) => String(post.id || '') === id || String(post.url || '').replace(/\.html$/, '') === id);
+        if (index < 0) {
+          notFound();
+          return;
+        }
+        const post = sorted[index];
+        setMeta(post);
+        const article = make('article', 'story-post');
+        const header = make('header', 'post-head');
+        const time = make('time', null, formatDate(post.date));
+        time.dateTime = String(post.date || '');
+        header.appendChild(time);
+        header.appendChild(make('h1', null, String(post.title || '(제목 없음)')));
+        const meta = make('p', 'post-meta', String(post.author || '위드리빙'));
+        header.appendChild(meta);
+        if (Array.isArray(post.tags) && post.tags.length) {
+          const tags = make('div', 'post-tags');
+          post.tags.forEach((tag) => tags.appendChild(make('span', null, String(tag))));
+          header.appendChild(tags);
+        }
+        article.appendChild(header);
+        article.appendChild(renderBody(post.body));
+        const faq = Array.isArray(post.faq) ? post.faq.filter((item) => item && item.q && item.a) : [];
+        if (faq.length) {
+          const section = make('section', 'faq');
+          section.appendChild(make('h2', null, '자주 묻는 질문'));
+          faq.forEach((item) => {
+            const detail = make('details');
+            detail.appendChild(make('summary', null, String(item.q)));
+            detail.appendChild(make('p', null, String(item.a)));
+            section.appendChild(detail);
+          });
+          article.appendChild(section);
+        }
+        if (Array.isArray(post.sources) && post.sources.length) {
+          const section = make('section', 'sources');
+          section.appendChild(make('h2', null, '참고·출처'));
+          const list = make('ol');
+          post.sources.forEach((source) => {
+            const item = make('li');
+            const link = make('a', null, String(source.title || source.url || '출처'));
+            link.href = String(source.url || '#');
+            link.target = '_blank';
+            link.rel = 'noopener';
+            item.appendChild(link);
+            list.appendChild(item);
+          });
+          section.appendChild(list);
+          article.appendChild(section);
+        }
+        const older = sorted[index + 1];
+        const newer = sorted[index - 1];
+        if (older || newer) {
+          const nav = make('nav', 'post-nav');
+          nav.setAttribute('aria-label', '이전 글과 다음 글');
+          [older, newer].forEach((item, navIndex) => {
+            if (!item) {
+              nav.appendChild(make('span'));
+              return;
+            }
+            const link = make('a');
+            link.href = hrefOf(item);
+            link.appendChild(make('small', null, navIndex === 0 ? '이전 글' : '다음 글'));
+            link.appendChild(make('strong', null, String(item.title || '')));
+            nav.appendChild(link);
+          });
+          article.appendChild(nav);
+        }
+        root.appendChild(article);
+      })
+      .catch(notFound);
+  }());
+  </script>
+</body>
+</html>

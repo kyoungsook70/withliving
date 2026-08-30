@@ -114,12 +114,15 @@ async function renderStories() {
     const response = await fetch('story/posts.json');
     if (!response.ok) throw new Error('posts.json');
     const posts = await response.json();
+    const sortedPosts = (Array.isArray(posts) ? posts : []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
     containers.forEach((container) => {
-      const limit = Number(container.dataset.limit || posts.length);
-      container.innerHTML = posts.slice(0, limit).map((post) => `
-        <article class="story-card"><p>${post.tags?.[0] || 'LIVING NOTE'} · ${post.date}</p>
-        <h3><a href="story/${post.url}">${post.title}</a></h3><span>${post.summary}</span>
-        <a class="text-link" href="story/${post.url}">읽어보기 <span aria-hidden="true">→</span></a></article>`).join('');
+      const limit = Number(container.dataset.limit || sortedPosts.length);
+      container.innerHTML = sortedPosts.slice(0, limit).map((post) => {
+        const href = post.url ? `story/${post.url}` : `story/post.html?id=${encodeURIComponent(post.id || '')}`;
+        return `<article class="story-card"><p>${post.tags?.[0] || 'LIVING NOTE'} · ${post.date}</p>
+        <h3><a href="${href}">${post.title}</a></h3><span>${post.summary}</span>
+        <a class="text-link" href="${href}">읽어보기 <span aria-hidden="true">→</span></a></article>`;
+      }).join('');
     });
   } catch {
     containers.forEach((container) => { container.innerHTML = '<p class="empty-note">생활 이야기를 준비하고 있어요.</p>'; });

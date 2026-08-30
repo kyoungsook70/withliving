@@ -117,6 +117,7 @@ h1, h2, h3, .founder-quote p { font-family: var(--display); }
 .story-card > p { margin: 0 0 2.5rem; color: var(--accent); font-size: .6rem; font-weight: 650; letter-spacing: .1em; }
 .story-card h3 { margin: 0; font-size: clamp(1.5rem,2.3vw,2.25rem); font-weight: 280; line-height: 1.25; letter-spacing: -.045em; }
 .story-card > span { display: block; min-height: 6rem; margin: 1.2rem 0; color: var(--dim); font-size: .84rem; }
+.story-more { display: flex; justify-content: center; margin-top: clamp(4rem,8vh,6rem); }
 .cta-band { padding: var(--section) var(--pad); text-align: center; color: var(--ivory); background: var(--green); }
 .cta-band h2 { max-width: 16ch; margin: 0 auto 3rem; }
 
@@ -197,11 +198,13 @@ h1, h2, h3, .founder-quote p { font-family: var(--display); }
 .pending-label { display: inline-block; padding: .6rem 0; border-bottom: 1px solid var(--line); color: var(--dim); font-size: .78rem; }
 
 .story-index { background: var(--ivory); }
+.story-page-hero > p:last-child { max-width: 40ch; }
 .story-list article { display: grid; grid-template-columns: .55fr 1.2fr 1fr; gap: 3rem; padding: clamp(2.5rem,6vh,4rem) 0; border-top: 1px solid var(--line); }
 .story-list p { margin: 0; color: var(--accent); font-size: .68rem; }
 .story-list h2 { margin: 0; font-size: clamp(1.7rem,3vw,3rem); font-weight: 400; line-height: 1.35; letter-spacing: -.04em; }
 .story-list span { color: var(--dim); font-size: .84rem; }
-.admin-note, .article { width: min(860px,calc(100% - 2.5rem)); margin: auto; padding: clamp(6rem,15vh,11rem) 0; }
+.admin-note { width: min(860px,calc(100% - 2.5rem)); margin: auto; padding: clamp(6rem,15vh,11rem) 0; }
+.article { width: min(680px,calc(100% - 2.5rem)); margin: auto; padding: clamp(8rem,17vh,12rem) 0; }
 .article .back-link { display: inline-block; margin-bottom: 5rem; border-bottom: 1px solid var(--line); font-size: .78rem; }
 .article header { padding-bottom: 3rem; border-bottom: 1px solid var(--line); }
 .article header p { color: var(--accent); font-size: .68rem; }
@@ -210,6 +213,27 @@ h1, h2, h3, .founder-quote p { font-family: var(--display); }
 .article .lead { margin: 5rem 0; font-size: clamp(1.25rem,2.4vw,1.75rem); font-weight: 300; line-height: 1.65; }
 .article h2 { margin: 5rem 0 1rem; font-size: 1.7rem; font-weight: 320; }
 .article > p:not(.lead) { color: var(--dim); }
+.post-head time, .post-meta { color: var(--dim); font-size: .72rem; }
+.post-meta { margin: .75rem 0 0; }
+.post-tags { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.25rem; }
+.post-tags span { padding: .25rem .65rem; color: var(--accent); border: 1px solid var(--line); font-size: .65rem; }
+.post-body { padding-top: 3.5rem; }
+.post-body p, .post-body li { color: var(--dim); }
+.post-body p { margin: 0 0 1.7rem; }
+.post-body h2 { margin: 4.5rem 0 1.2rem; font-size: clamp(1.65rem,3vw,2.15rem); font-weight: 400; }
+.post-body ul { margin: 0 0 2rem 1.25rem; padding: 0; }
+.post-body li { margin-bottom: .6rem; }
+.post-body li::marker { color: var(--accent); }
+.sources { margin: 5rem 0; }
+.sources ol { padding-left: 1.25rem; }
+.sources a { border-bottom: 1px solid currentColor; }
+.post-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 6rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.post-nav a { display: grid; gap: .4rem; padding: 1.5rem 0; }
+.post-nav a:last-child { text-align: right; }
+.post-nav small { color: var(--accent); font-size: .65rem; letter-spacing: .12em; }
+.post-nav strong { font-family: var(--display); font-weight: 400; line-height: 1.55; }
+.notfound { padding: 6rem 0; text-align: center; }
+.notfound p { margin: 1rem auto 2rem; color: var(--dim); }
 .faq { margin: 6rem 0; }
 .faq details { padding: 1.3rem 0; border-top: 1px solid var(--line); }
 .faq details:last-child { border-bottom: 1px solid var(--line); }
@@ -295,6 +319,9 @@ h1, h2, h3, .founder-quote p { font-family: var(--display); }
   .timeline-list li { grid-template-columns: 1fr; gap: .8rem; }
   .timeline-list p { margin-top: .4rem; }
   .story-list article { grid-template-columns: 1fr; gap: 1rem; }
+  .story-page-hero > p:last-child br { display: none; }
+  .post-nav { grid-template-columns: 1fr; }
+  .post-nav a:last-child { text-align: left; }
   .site-footer { padding-block: 3rem; }
 }
 
