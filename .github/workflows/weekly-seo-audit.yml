@@ -1,0 +1,66 @@
+name: Weekly WITH LIVING SEO audit
+
+on:
+  schedule:
+    # 00:00 UTC = 월요일 09:00 Asia/Seoul
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: weekly-withliving-seo-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create weekly audit branch
+        run: git switch -c "codex/weekly-seo-audit-$(TZ=Asia/Seoul date +%F)-${{ github.run_id }}"
+
+      - name: Run all 13 checks and safe fixes
+        run: |
+          python scripts/audit_site.py --fix
+          python -m json.tool story/posts.json >/dev/null
+          python -c "from xml.etree import ElementTree as ET; ET.parse('sitemap.xml'); ET.parse('feed.xml')"
+          test -z "$(git diff --check)"
+
+      - name: Commit audit result
+        run: |
+          git config user.name "kyoungsook70"
+          git config user.email "kyoungsook70@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Run weekly WITH LIVING SEO audit $(TZ=Asia/Seoul date +%F)"
+          git push --set-upstream origin HEAD
+
+      - name: Open audit pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "## 주간 SEO·AEO·GEO 점검"
+            echo
+            cat reports/seo-audit.md
+            echo
+            echo "글 내용은 변경하지 않았으며, 자동 수정은 사실관계에 영향을 주지 않는 항목으로 제한했습니다."
+          } > weekly-pr-body.md
+          gh pr create \
+            --base main \
+            --head "$(git branch --show-current)" \
+            --title "주간 위드리빙 SEO 점검: $(TZ=Asia/Seoul date +%F)" \
+            --body-file weekly-pr-body.md
