@@ -71,7 +71,7 @@
         return response.json();
       })
       .then((posts) => {
-        const sorted = (Array.isArray(posts) ? posts : []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+        const sorted = (Array.isArray(posts) ? posts : []).filter((post) => !post.draft && post.url).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
         if (!sorted.length) {
           list.appendChild(make('p', 'empty-note', '첫 번째 이야기를 준비하고 있어요.'));
           return;
@@ -81,7 +81,7 @@
           const date = make('p', null, formatDate(post.date));
           const title = make('h2');
           const link = make('a', null, String(post.title || '(제목 없음)'));
-          link.href = post.url ? String(post.url) : 'post.html?id=' + encodeURIComponent(String(post.id || ''));
+          link.href = String(post.url);
           title.appendChild(link);
           article.appendChild(date);
           article.appendChild(title);

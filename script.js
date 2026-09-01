@@ -114,11 +114,11 @@ async function renderStories() {
     const response = await fetch('story/posts.json');
     if (!response.ok) throw new Error('posts.json');
     const posts = await response.json();
-    const sortedPosts = (Array.isArray(posts) ? posts : []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    const sortedPosts = (Array.isArray(posts) ? posts : []).filter((post) => !post.draft && post.url).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
     containers.forEach((container) => {
       const limit = Number(container.dataset.limit || sortedPosts.length);
       container.innerHTML = sortedPosts.slice(0, limit).map((post) => {
-        const href = post.url ? `story/${post.url}` : `story/post.html?id=${encodeURIComponent(post.id || '')}`;
+        const href = `story/${post.url}`;
         return `<article class="story-card"><p>${post.tags?.[0] || 'LIVING NOTE'} · ${post.date}</p>
         <h3><a href="${href}">${post.title}</a></h3><span>${post.summary}</span>
         <a class="text-link" href="${href}">읽어보기 <span aria-hidden="true">→</span></a></article>`;

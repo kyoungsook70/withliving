@@ -78,7 +78,7 @@ a.plain{color:var(--a-brand)}
 <body>
 <div class="wrap">
   <h1>블로그 관리</h1>
-  <p class="sub">글을 쓰면 GitHub 저장소의 posts.json이 수정되고, Vercel이 자동으로 재배포합니다.</p>
+  <p class="sub">새 글은 안전하게 초안으로 저장됩니다. 검색 가능한 정적 페이지 발행은 별도 작업으로 진행합니다.</p>
 
   <!-- ===== 연결 화면 ===== -->
   <section id="view-connect" class="hidden">
@@ -159,6 +159,7 @@ a.plain{color:var(--a-brand)}
         <label>참고·출처 <small>(선택. 한 줄에 하나, <code>제목 | URL</code> 형식)</small></label>
         <textarea id="f-sources" rows="2" placeholder="식약처 기능성화장품 안내 | https://..."></textarea>
         <div class="help">
+          새 글은 공개되지 않는 초안으로 저장됩니다. 정적 HTML·sitemap·feed·llms.txt 생성 후에만 공개해야 합니다.<br>
           본문 작성 규칙 (이것만 지원해요)<br>
           &bull; 문단 나누기: 빈 줄 한 줄<br>
           &bull; 소제목: 줄 맨 앞에 <code>## </code><br>
@@ -341,7 +342,7 @@ a.plain{color:var(--a-brand)}
       var tr = document.createElement('tr');
       var tdT = document.createElement('td');
       tdT.className = 'title-cell';
-      tdT.textContent = String(p.title || '(제목 없음)');
+      tdT.textContent = String(p.title || '(제목 없음)') + (p.draft ? ' (초안)' : '');
       var tdD = document.createElement('td');
       var span = document.createElement('span');
       span.className = 'date';
@@ -377,6 +378,10 @@ a.plain{color:var(--a-brand)}
   });
 
   function removePost(p){
+    if (p.url && !p.draft){
+      alert('발행된 정적 글은 이 화면에서 삭제하면 sitemap과 정적 파일이 남습니다. 정적 페이지 발행 작업으로 삭제해 주세요.');
+      return;
+    }
     if (!confirm('"' + String(p.title||'') + '" 글을 삭제할까요? 되돌릴 수 없습니다.')) return;
     var newPosts = posts.filter(function(x){ return x.id !== p.id; });
     setStatus('list-status','info','삭제하는 중...');
@@ -394,6 +399,10 @@ a.plain{color:var(--a-brand)}
     clearStatus('edit-status');
     var p = null;
     if (id) posts.forEach(function(x){ if (x.id === id) p = x; });
+    if (p && p.url && !p.draft){
+      alert('이미 발행된 정적 글은 이 화면에서 수정하면 본문과 검색 데이터가 달라질 수 있습니다. 정적 페이지 발행 작업으로 수정해 주세요.');
+      return;
+    }
     $('edit-heading').textContent = p ? '글 수정' : '새 글 쓰기';
     $('f-title').value = p ? String(p.title||'') : '';
     $('f-date').value = p ? String(p.date||today()) : today();
@@ -435,6 +444,7 @@ a.plain{color:var(--a-brand)}
       tags: $('f-tags').value.split(',').map(function(s){return s.trim();}).filter(Boolean),
       body: $('f-body').value.replace(/\r\n/g,'\n').trim()
     });
+    if (!prev) post.draft = true;
     if (author) post.author = author; else delete post.author;
     if (faq.length) post.faq = faq; else delete post.faq;
     if (sources.length) post.sources = sources; else delete post.sources;
@@ -453,7 +463,7 @@ a.plain{color:var(--a-brand)}
         btn.disabled = false;
         renderList();
         show('view-list');
-        setStatus('list-status','ok','저장 완료 — Vercel이 1~2분 안에 자동 재배포합니다. 위의 "내 블로그 열기"로 확인해 보세요.');
+        setStatus('list-status','ok','초안 저장 완료 — 공개·검색 노출 전 정적 페이지 발행 작업이 필요합니다.');
       })
       .catch(function(err){
         btn.disabled = false;

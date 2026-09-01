@@ -103,7 +103,7 @@
         return response.json();
       })
       .then((posts) => {
-        const sorted = (Array.isArray(posts) ? posts : []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+        const sorted = (Array.isArray(posts) ? posts : []).filter((post) => !post.draft).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
         const id = new URLSearchParams(location.search).get('id') || new URLSearchParams(location.search).get('slug');
         const index = sorted.findIndex((post) => String(post.id || '') === id || String(post.url || '').replace(/\.html$/, '') === id);
         if (index < 0) {
