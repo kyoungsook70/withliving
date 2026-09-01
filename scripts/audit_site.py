@@ -180,8 +180,13 @@ def audit(pages: dict[Path, PageParser]) -> list[tuple[str, str, str]]:
     results.append(("5", "통과" if not bad else "실패", "alt 누락: " + ", ".join(bad) if bad else "이미지 alt 누락 없음"))
 
     bad = []
+    forbidden_schema_keys = {
+        "aggregateRating", "review", "reviewCount", "ratingValue",
+        "availability", "nutrition", "shippingDetails", "hasMerchantReturnPolicy",
+    }
     for path, page in pages.items():
         types, errors = jsonld_types(page)
+        unsafe = sorted(key for key in forbidden_schema_keys if any(f'"{key}"' in raw for raw in page.jsonld))
         expected: set[str] = set()
         relative = path.relative_to(ROOT)
         if relative == Path("index.html"):
@@ -190,8 +195,9 @@ def audit(pages: dict[Path, PageParser]) -> list[tuple[str, str, str]]:
             expected = {"Product"}
         elif relative.parent == Path("story") and relative.name not in {"index.html"}:
             expected = {"BlogPosting", "BreadcrumbList"}
-        if errors or not expected.issubset(types):
-            bad.append(f"{rel(path)}({','.join(sorted(expected - types)) or 'JSON 오류'})")
+        if errors or not expected.issubset(types) or unsafe:
+            detail = ",".join(sorted(expected - types)) or ("금지 속성:" + ",".join(unsafe) if unsafe else "JSON 오류")
+            bad.append(f"{rel(path)}({detail})")
     results.append(("6", "통과" if not bad else "실패", "JSON-LD 이상: " + ", ".join(bad) if bad else "필수 구조화 데이터 확인"))
 
     posts = json.loads((ROOT / "story/posts.json").read_text(encoding="utf-8"))
