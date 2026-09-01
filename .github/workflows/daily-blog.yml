@@ -2,8 +2,8 @@ name: Daily WITH LIVING blog
 
 on:
   schedule:
-    # 23:00 UTC = 08:00 Asia/Seoul (다음 날)
-    - cron: "0 23 * * *"
+    # 12:30 UTC = 21:30 Asia/Seoul
+    - cron: "30 12 * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,24 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  start-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        name: Start on 2026-09-03 KST
+        run: |
+          local_date="$(TZ=Asia/Seoul date +%F)"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" || "$local_date" > "2026-09-02" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
   publish:
+    needs: start-gate
+    if: needs.start-gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
