@@ -1,12 +1,12 @@
 {
-  "title": "각티슈 내용물만 빼서 티슈케이스에 넣어도 흐트러지지 않나요? | 위드리빙",
-  "slug": "can-i-put-tissue-contents-into-a-tissue-case",
-  "url": "https://www.withliving.kr/story/can-i-put-tissue-contents-into-a-tissue-case.html",
+  "title": "우리 집 각티슈가 티슈케이스에 맞는지 어떻게 확인하나요? | 위드리빙",
+  "slug": "does-my-box-tissue-fit-in-a-tissue-case",
+  "url": "https://www.withliving.kr/story/does-my-box-tissue-fit-in-a-tissue-case.html",
   "fact_check": [
     "본문의 생활용품 사용·관리 설명이 연결된 출처와 일치하는지 확인",
     "브랜드 고유 사실과 제품 연결이 story/brand.md 및 products.json과 일치하는지 확인",
     "제품명·가격·크기·구매 URL이 products.json의 실제 정보와 일치하는지 확인"
   ],
-  "remaining_ideas": 27,
+  "remaining_ideas": 26,
   "added_ideas": 0
 }
