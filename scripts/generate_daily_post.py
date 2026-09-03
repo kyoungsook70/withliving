@@ -35,12 +35,31 @@ def fail(message: str) -> None:
     raise SystemExit(f"오류: {message}")
 
 
+TOPIC_FAMILIES = (
+    ("tissue", ("티슈", "휴지")),
+    ("seat", ("방석", "쿠션", "메모리폼")),
+    ("lumbar", ("허리", "복대")),
+    ("lock", ("자물쇠", "와이어")),
+    ("humidifier", ("가습기",)),
+    ("storage", ("수납", "정리")),
+)
+
+
+def topic_family(title: str) -> str:
+    normalized = title.lower().replace(" ", "")
+    for family, keywords in TOPIC_FAMILIES:
+        if any(keyword.lower().replace(" ", "") in normalized for keyword in keywords):
+            return family
+    return "other"
+
+
 def next_topic() -> str:
-    text = (STORY / "ideas.md").read_text(encoding="utf-8")
-    match = re.search(r"^- \[ \] (.+)$", text, re.MULTILINE)
-    if not match:
+    topics = unchecked_topics()
+    if not topics:
         fail("story/ideas.md에 남은 미발행 주제가 없습니다.")
-    return match.group(1).strip()
+    posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
+    previous_family = topic_family(posts[0]["title"]) if posts else None
+    return next((topic for topic in topics if topic_family(topic) != previous_family), topics[0])
 
 
 def unchecked_topics() -> list[str]:
@@ -102,7 +121,8 @@ def replenish_topics() -> int:
 기존 FAQ에서 이어질 수 있는 질문:
 {faq_questions}
 
-제품의 성분·사용법·보관법, 현재 계절, 기존 FAQ의 후속 질문을 고르게 활용하세요.
+제품의 선택법·사용법·관리법, 공간별 활용, 현재 계절, 기존 FAQ의 후속 질문을 고르게 활용하세요.
+10개 글감은 티슈케이스·방석·허리용품·자물쇠·가습기·수납 등 최소 5개 제품군으로 나누고, 같은 제품군은 2개를 넘기지 마세요.
 의학적 진단·치료를 전제로 하거나 효능을 단정하는 질문은 제외하고, 각 항목은 자연스러운 한국어 질문 한 문장으로 작성하세요.
 """
     payload = {
@@ -284,6 +304,23 @@ def body_text(post: dict) -> str:
     return "\n\n".join(parts)
 
 
+def article_markdown(post: dict) -> str:
+    lines = [f"# {post['title']}", "", f"> {post['description']}", "", post["intro"]]
+    for section in post["sections"]:
+        lines.extend(["", f"## {section['heading']}", ""])
+        lines.extend(section["paragraphs"])
+        if section["bullets"]:
+            lines.append("")
+            lines.extend(f"- {item}" for item in section["bullets"])
+    lines.extend(["", "## 자주 묻는 질문"])
+    for item in post["faq"]:
+        lines.extend(["", f"### {item['q']}", "", item["a"]])
+    lines.extend(["", "## 참고·출처", ""])
+    lines.extend(f"- [{item['title']}]({item['url']})" for item in post["sources"])
+    lines.extend(["", "## 다음 단계", "", post["cta_text"], "", f"[연결 페이지 확인]({post['cta_url']})"])
+    return "\n".join(lines)
+
+
 def body_html(post: dict) -> str:
     chunks = [f"<p>{html.escape(post['intro'])}</p>"]
     for section in post["sections"]:
@@ -425,6 +462,7 @@ def main() -> None:
         "title": post["title"],
         "slug": post["slug"],
         "url": f"{DOMAIN}/story/{post['slug']}.html",
+        "article_markdown": article_markdown(post),
         "fact_check": [
             "본문의 생활용품 사용·관리 설명이 연결된 출처와 일치하는지 확인",
             "브랜드 고유 사실과 제품 연결이 story/brand.md 및 products.json과 일치하는지 확인",
