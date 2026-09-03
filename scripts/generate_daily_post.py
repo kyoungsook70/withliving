@@ -28,6 +28,8 @@ DOMAIN = "https://www.withliving.kr"
 AUTHOR = "이경숙 위드리빙 대표"
 BRAND = "위드리빙"
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4-mini")
+TREND_API_BASE_URL = os.environ.get("TREND_API_BASE_URL", "").rstrip("/")
+TREND_API_TOKEN = os.environ.get("TREND_API_TOKEN", "")
 KST = timezone(timedelta(hours=9))
 
 
@@ -94,6 +96,95 @@ def call_openai(payload: dict) -> dict:
     if not output_text:
         fail(f"모델이 결과를 반환하지 않았습니다. 상태: {raw.get('status')}")
     return json.loads(output_text)
+
+
+def fetch_trend_signals() -> dict:
+    if not TREND_API_BASE_URL or not TREND_API_TOKEN:
+        return {"available": False, "reason": "트렌드 API가 연결되지 않아 웹 검색 신호만 사용"}
+    request = urllib.request.Request(
+        f"{TREND_API_BASE_URL}/trends/automation/recommendations",
+        headers={"x-automation-token": TREND_API_TOKEN, "Accept": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            payload = json.load(response)
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        return {"available": False, "reason": f"트렌드 API 연결 실패: {type(exc).__name__}"}
+    if not payload.get("ok"):
+        return {"available": False, "reason": payload.get("message", "트렌드 API 응답 오류")}
+    return {"available": True, "dataMeaning": payload.get("dataMeaning"), "cards": payload.get("cards", [])}
+
+
+def select_best_topic() -> tuple[str, list[dict], dict]:
+    brand = (STORY / "brand.md").read_text(encoding="utf-8")
+    products = (ROOT / "products.json").read_text(encoding="utf-8")
+    posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
+    published = "\n".join(f"- {post['title']}" for post in posts[:40])
+    queued = "\n".join(f"- {topic}" for topic in unchecked_topics())
+    trend_signals = fetch_trend_signals()
+    candidate_schema = {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string"},
+            "timeliness": {"type": "integer", "minimum": 0, "maximum": 20},
+            "search_intent": {"type": "integer", "minimum": 0, "maximum": 20},
+            "usefulness": {"type": "integer", "minimum": 0, "maximum": 25},
+            "distinctiveness": {"type": "integer", "minimum": 0, "maximum": 15},
+            "source_quality": {"type": "integer", "minimum": 0, "maximum": 15},
+            "product_fit": {"type": "integer", "minimum": 0, "maximum": 5},
+            "total": {"type": "integer", "minimum": 0, "maximum": 100},
+            "reason": {"type": "string"},
+            "evidence_urls": {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": 4},
+        },
+        "required": ["title", "timeliness", "search_intent", "usefulness", "distinctiveness", "source_quality", "product_fit", "total", "reason", "evidence_urls"],
+        "additionalProperties": False,
+    }
+    prompt = f"""오늘은 {datetime.now(KST).date().isoformat()}입니다. 위드리빙의 오늘 블로그 후보 10개를 실제 웹 검색으로 조사하고 채점하세요.
+
+브랜드 편집 기준:
+{brand}
+
+실제 제품 정보:
+{products}
+
+대기 중인 아이디어(그대로 쓸 의무는 없으며 더 좋은 최신 주제를 새로 제안해도 됨):
+{queued}
+
+최근 발행 제목(핵심 답·상황·제품까지 중복 금지):
+{published}
+
+네이버 쇼핑 트렌드 보조 신호:
+{json.dumps(trend_signals, ensure_ascii=False)[:12000]}
+
+반드시 한국 독자가 현재 검색할 이유가 있는 인테리어·정리·계절 살림·여행·외출 생활정보를 조사하세요.
+공식기관·공식 사업자·신뢰할 1차 자료를 우선하고 evidence_urls에 실제로 확인한 HTTPS URL을 넣으세요.
+쇼핑 트렌드는 검색량이 아니라 인기검색어 순위 신호이므로 product 실제 검색량처럼 표현하지 마세요.
+제목만 궁금하게 하고 상식적인 답만 주는 주제, 제품 사용법만 묻는 작은 질문, 기존 글의 말바꾸기는 낮게 채점하세요.
+각 후보 total은 timeliness(20)+search_intent(20)+usefulness(25)+distinctiveness(15)+source_quality(15)+product_fit(5)의 정확한 합이어야 합니다.
+제품 연결이 없어도 유용하면 높은 점수를 줄 수 있습니다. 후보는 total 내림차순으로 반환하세요.
+"""
+    result = call_openai({
+        "model": MODEL,
+        "tools": [{"type": "web_search"}],
+        "tool_choice": "required",
+        "input": prompt,
+        "store": False,
+        "text": {"format": {"type": "json_schema", "name": "withliving_topic_research", "strict": True, "schema": {
+            "type": "object", "properties": {"candidates": {"type": "array", "items": candidate_schema, "minItems": 10, "maxItems": 10}},
+            "required": ["candidates"], "additionalProperties": False,
+        }}},
+    })
+    candidates = result["candidates"]
+    for candidate in candidates:
+        calculated = sum(candidate[key] for key in ("timeliness", "search_intent", "usefulness", "distinctiveness", "source_quality", "product_fit"))
+        if candidate["total"] != calculated:
+            fail(f"글감 점수 합계가 맞지 않습니다: {candidate['title']}")
+        if any(urlparse(url).scheme != "https" for url in candidate["evidence_urls"]):
+            fail(f"글감 근거 URL이 HTTPS가 아닙니다: {candidate['title']}")
+    candidates.sort(key=lambda item: item["total"], reverse=True)
+    if candidates[0]["total"] < 70:
+        fail(f"오늘은 70점 이상 글감이 없습니다. 최고점: {candidates[0]['total']}점")
+    return candidates[0]["title"], candidates, trend_signals
 
 
 def replenish_topics() -> int:
@@ -235,6 +326,9 @@ def generate(topic: str) -> dict:
 필수 기준:
 - 제목은 고객이 검색하는 질문형이며 48자 이내입니다(사이트명 포함 title 60자 이내).
 - description은 80~150자, 첫 문단은 질문에 2~3문장으로 직접 답합니다.
+- 글의 80% 이상은 독자가 바로 적용할 수 있는 구체적인 생활 정보로 채웁니다.
+- 제품보다 문제의 원인, 해결 순서, 선택 기준과 흔한 실수를 먼저 충분히 설명합니다.
+- 친근한 대화체로 쓰고, 새 이미지 없이도 비교·목록만으로 완전히 이해되게 작성합니다.
 - H2 3~5개, 각 절에는 독립적으로 인용 가능한 핵심 문장을 포함합니다.
 - 생활용품을 의료기기처럼 설명하거나 통증 완화·치료·안전 효과를 약속하지 않습니다.
 - 웹 검색으로 확인한 공공기관, 학회, 논문, 제조사 공식 페이지 등 신뢰할 만한 1차 출처만 사용합니다.
@@ -387,9 +481,12 @@ def update_ideas(topic: str) -> None:
     path = STORY / "ideas.md"
     text = path.read_text(encoding="utf-8")
     old = f"- [ ] {topic}"
-    if text.count(old) != 1:
-        fail("선택한 주제를 ideas.md에서 하나로 식별할 수 없습니다.")
-    path.write_text(text.replace(old, f"- [x] {topic}", 1), encoding="utf-8")
+    if text.count(old) == 1:
+        path.write_text(text.replace(old, f"- [x] {topic}", 1), encoding="utf-8")
+    elif old not in text:
+        path.write_text(text.rstrip() + f"\n- [x] {topic}\n", encoding="utf-8")
+    else:
+        fail("선택한 주제가 ideas.md에 중복되어 있습니다.")
 
 
 def update_sitemap(posts: list[dict], published: str) -> None:
@@ -446,7 +543,7 @@ def main() -> None:
         print(f"자동 발행 준비 완료. 다음 주제: {next_topic()}")
         return
     added = replenish_topics()
-    topic = next_topic()
+    topic, topic_candidates, trend_signals = select_best_topic()
     published = args.date or datetime.now(KST).date().isoformat()
     date.fromisoformat(published)
     post = generate(topic)
@@ -470,6 +567,10 @@ def main() -> None:
         ],
         "remaining_ideas": len(unchecked_topics()),
         "added_ideas": added,
+        "topic_score": topic_candidates[0]["total"],
+        "topic_reason": topic_candidates[0]["reason"],
+        "topic_candidates": topic_candidates,
+        "trend_api_used": trend_signals.get("available", False),
     }
     (ROOT / "daily-review.json").write_text(
         json.dumps(review, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
