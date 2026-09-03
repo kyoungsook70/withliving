@@ -230,6 +230,9 @@ h1, h2, h3, .founder-quote p { font-family: var(--display); }
 .post-body ul { margin: 0 0 2rem 1.25rem; padding: 0; }
 .post-body li { margin-bottom: .6rem; }
 .post-body li::marker { color: var(--accent); }
+.story-hero { margin: 3rem 0 1rem; }
+.story-hero img { display: block; width: 100%; height: auto; border-radius: 2px; }
+.story-hero figcaption { margin-top: .7rem; color: var(--dim); font-size: .72rem; }
 .sources { margin: 5rem 0; }
 .sources ol { padding-left: 1.25rem; }
 .sources a { border-bottom: 1px solid currentColor; }

@@ -107,7 +107,7 @@ def replenish_topics() -> int:
     faq_questions = "\n".join(
         f"- {faq['q']}" for post in posts[:30] for faq in post.get("faq", [])
     )
-    prompt = f"""위드리빙 생활용품 고객이 검색창에 입력할 질문형 블로그 글감 10개를 새로 만드세요.
+    prompt = f"""위드리빙 독자가 검색하거나 저장해 두고 싶은 생활정보형 블로그 글감 10개를 새로 만드세요.
 
 브랜드 기준:
 {brand}
@@ -121,9 +121,11 @@ def replenish_topics() -> int:
 기존 FAQ에서 이어질 수 있는 질문:
 {faq_questions}
 
-제품의 선택법·사용법·관리법, 공간별 활용, 현재 계절, 기존 FAQ의 후속 질문을 고르게 활용하세요.
-10개 글감은 티슈케이스·방석·허리용품·자물쇠·가습기·수납 등 최소 5개 제품군으로 나누고, 같은 제품군은 2개를 넘기지 마세요.
-의학적 진단·치료를 전제로 하거나 효능을 단정하는 질문은 제외하고, 각 항목은 자연스러운 한국어 질문 한 문장으로 작성하세요.
+인테리어, 정리·수납, 계절 살림, 집안 관리, 여행과 외출 준비를 고르게 다루세요.
+10개 중 7개는 제품을 언급하지 않아도 완결되는 순수 생활정보, 3개만 실제 제품과 자연스럽게 연결할 수 있는 생활정보로 만드세요.
+제품명이나 규격을 제목에 넣지 말고, 최근 15개 글과 같은 제품·상황·핵심 답을 반복하지 마세요.
+제목만 궁금하게 만들고 답을 피하는 주제, 지나치게 작은 사용법 질문, 의학적 진단·치료나 효능을 전제로 하는 질문은 제외하세요.
+각 항목은 독자가 무엇을 알게 되는지 분명한 자연스러운 한국어 질문 한 문장으로 작성하세요.
 """
     payload = {
         "model": MODEL,
@@ -235,13 +237,18 @@ def generate(topic: str) -> dict:
 필수 기준:
 - 제목은 고객이 검색하는 질문형이며 48자 이내입니다(사이트명 포함 title 60자 이내).
 - description은 80~150자, 첫 문단은 질문에 2~3문장으로 직접 답합니다.
+- 글의 80% 이상은 독자가 오늘 바로 적용할 수 있는 구체적인 생활 정보로 채웁니다.
+- 제품을 소개하기 전에 문제의 원인, 정리 순서, 선택 기준과 흔한 실수를 충분히 설명합니다.
+- 실제로 맞는 제품이 있을 때만 마지막 절에서 하나의 선택지로 짧게 연결하며, 억지로 추천하지 않습니다.
+- 친근한 대화체로 쓰되 뜬구름 잡는 표현, 같은 말의 반복, 답을 미루는 도입은 쓰지 않습니다.
 - H2 3~5개, 각 절에는 독립적으로 인용 가능한 핵심 문장을 포함합니다.
 - 생활용품을 의료기기처럼 설명하거나 통증 완화·치료·안전 효과를 약속하지 않습니다.
 - 웹 검색으로 확인한 공공기관, 학회, 논문, 제조사 공식 페이지 등 신뢰할 만한 1차 출처만 사용합니다.
 - 출처는 sources 배열에만 넣고, intro·sections·FAQ 안에는 URL, 마크다운 링크, 괄호형 인라인 출처를 넣지 않습니다.
 - 가격·효능·수치·인증·후기·경험을 만들지 않습니다. 브랜드가 제공한 사실 외의 브랜드 경험도 만들지 않습니다.
 - FAQ는 본문과 다른 실용 질문 3개입니다.
-- CTA는 products.json의 실제 쿠팡 제품 URL 중 자연스럽게 맞는 것을 사용하고, 맞는 제품이 없으면 products.json의 storeUrl을 사용합니다.
+- 글의 생활 문제와 자연스럽게 맞는 제품이 있을 때만 products.json의 실제 쿠팡 제품 URL을 CTA로 사용합니다.
+- 맞는 제품이 없으면 cta_text와 cta_url을 모두 빈 문자열로 두고, 억지로 제품이나 스토어를 연결하지 않습니다.
 - slug는 날짜 없는 영문 소문자 하이픈 형식입니다.
 """
     payload = {
@@ -285,6 +292,10 @@ def validate(post: dict) -> None:
         parsed = urlparse(source["url"])
         if parsed.scheme != "https" or not parsed.netloc:
             fail(f"출처 URL은 유효한 HTTPS 주소여야 합니다: {source['url']}")
+    if not post["cta_url"]:
+        if post["cta_text"]:
+            fail("CTA URL이 없으면 CTA 문구도 비워야 합니다.")
+        return
     parsed_cta = urlparse(post["cta_url"])
     allowed_hosts = {"www.coupang.com", "link.coupang.com", "shop.coupang.com"}
     if parsed_cta.scheme != "https" or parsed_cta.netloc not in allowed_hosts:
@@ -354,6 +365,9 @@ def render_page(post: dict, published: str, previous: dict | None) -> str:
     else:
         related = '<p><a href="../products.html">위드리빙 제품 페이지</a>도 함께 확인해 보세요.</p>'
     display_date = published.replace("-", ".")
+    cta = ""
+    if post["cta_url"]:
+        cta = f'<p>{html.escape(post["cta_text"])}</p><a class="button" href="{html.escape(post["cta_url"], quote=True)}" target="_blank" rel="noopener">쿠팡에서 제품 보기 ↗</a>'
     return f'''<!doctype html>
 <html lang="ko">
 <head>
@@ -369,7 +383,7 @@ def render_page(post: dict, published: str, previous: dict | None) -> str:
 <div class="blog-body">{body_html(post)}</div>{related}
 <section class="faq"><h2>자주 묻는 질문</h2>{faqs}</section>
 <section class="sources"><h2>참고·출처</h2><ol>{sources}</ol></section>
-<p>{html.escape(post['cta_text'])}</p><a class="button" href="{html.escape(post['cta_url'], quote=True)}" target="_blank" rel="noopener">쿠팡에서 제품 보기 ↗</a>
+{cta}
 </article></main><footer class="site-footer"><div class="footer-brand"><strong>위드리빙</strong><span>WITH LIVING</span></div><div><p>일상에 따뜻함을 더하는 생활용품</p><p>© <span data-year></span> WITH LIVING. ALL RIGHTS RESERVED.</p></div><div class="footer-links"><a href="../index.html#products">제품</a><a aria-current="page" href="./">이야기</a><a href="mailto:withnexgen@gmail.com" target="_blank" rel="noopener noreferrer">이메일</a><a href="https://www.instagram.com/shop0_w2h/" target="_blank" rel="noopener noreferrer">Instagram</a><a href="../contact.html">연락하기</a></div></footer><script src="../script.js" defer></script></body></html>
 '''
 
@@ -377,7 +391,9 @@ def render_page(post: dict, published: str, previous: dict | None) -> str:
 def update_posts(post: dict, published: str) -> list[dict]:
     path = STORY / "posts.json"
     posts = json.loads(path.read_text(encoding="utf-8"))
-    item = {"id": post["slug"], "url": f"{post['slug']}.html", "title": post["title"], "date": published, "description": post["description"], "summary": post["summary"], "tags": post["tags"], "body": body_text(post), "author": AUTHOR, "faq": post["faq"], "sources": post["sources"], "cta": {"label": "쿠팡에서 제품 보기", "url": post["cta_url"]}}
+    item = {"id": post["slug"], "url": f"{post['slug']}.html", "title": post["title"], "date": published, "description": post["description"], "summary": post["summary"], "tags": post["tags"], "body": body_text(post), "author": AUTHOR, "faq": post["faq"], "sources": post["sources"]}
+    if post["cta_url"]:
+        item["cta"] = {"label": "쿠팡에서 제품 보기", "url": post["cta_url"]}
     posts.insert(0, item)
     path.write_text(json.dumps(posts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return posts
