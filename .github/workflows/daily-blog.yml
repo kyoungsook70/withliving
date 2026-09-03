@@ -90,6 +90,12 @@ jobs:
           - 남은 글감: {review['remaining_ideas']}개
           - 새로 보충한 글감: {review['added_ideas']}개
 
+          > 공개 예정 URL은 Merge 전에는 404가 정상입니다. 아래에서 글 전체를 먼저 검토하세요.
+
+          ## 글 전체 미리보기
+
+          {review['article_markdown']}
+
           ## 사람이 사실 확인할 문장
 
           {checks}
