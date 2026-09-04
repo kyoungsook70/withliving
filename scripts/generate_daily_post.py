@@ -305,7 +305,7 @@ def response_schema() -> dict:
     }
 
 
-def generate(topic: str) -> dict:
+def generate(topic: str, retry_note: str = "") -> dict:
     brand = (STORY / "brand.md").read_text(encoding="utf-8")
     existing = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
     existing_titles = "\n".join(f"- {p['title']}" for p in existing[:30])
@@ -337,6 +337,7 @@ def generate(topic: str) -> dict:
 - FAQ는 본문과 다른 실용 질문 3개입니다.
 - CTA는 products.json의 실제 쿠팡 제품 URL 중 자연스럽게 맞는 것을 사용하고, 맞는 제품이 없으면 products.json의 storeUrl을 사용합니다.
 - slug는 날짜 없는 영문 소문자 하이픈 형식입니다.
+{f'- 이전 생성본이 검증에 실패했습니다: {retry_note}. 같은 오류 없이 전체 JSON을 새로 작성하세요.' if retry_note else ''}
 """
     payload = {
         "model": MODEL,
@@ -387,6 +388,20 @@ def validate(post: dict) -> None:
     allowed_urls = {products["storeUrl"], *(item["url"] for item in products["products"])}
     if post["cta_url"] not in allowed_urls:
         fail("CTA URL이 products.json의 실제 구매 주소와 일치하지 않습니다.")
+
+
+def generate_valid_post(topic: str) -> dict:
+    validation_error = ""
+    for attempt in range(3):
+        post = generate(topic, validation_error)
+        try:
+            validate(post)
+            return post
+        except SystemExit as exc:
+            validation_error = str(exc)
+            if attempt == 2:
+                raise
+    fail("글 검증 재시도에 실패했습니다.")
 
 
 def body_text(post: dict) -> str:
@@ -546,8 +561,7 @@ def main() -> None:
     topic, topic_candidates, trend_signals = select_best_topic()
     published = args.date or datetime.now(KST).date().isoformat()
     date.fromisoformat(published)
-    post = generate(topic)
-    validate(post)
+    post = generate_valid_post(topic)
     current_posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
     (STORY / f"{post['slug']}.html").write_text(render_page(post, published, current_posts[0] if current_posts else None), encoding="utf-8")
     posts = update_posts(post, published)
