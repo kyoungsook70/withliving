@@ -329,9 +329,10 @@ def generate(topic: str, retry_note: str = "") -> dict:
     existing_titles = "\n".join(f"- {p['title']}" for p in existing[:30])
     existing_faqs = "\n".join(f"- {faq['q']}" for p in existing[:30] for faq in p.get("faq", []))
     products = (ROOT / "products.json").read_text(encoding="utf-8")
-    prompt = f"""아래 주제로 위드리빙 공식 블로그 글 한 편을 한국어로 작성하세요.
+    prompt = f"""웹검색을 통해 지금 독자에게 유용한 최신·계절성 생활정보를 찾아 위드리빙 공식 블로그 글 한 편을 한국어로 작성하세요.
 
-주제: {topic}
+글감 힌트: {topic}
+이 힌트는 제품 설명을 쓰라는 지시가 아닙니다. 현재 날짜의 계절·생활 이슈와 맞지 않으면 더 시의성 있는 생활정보 주제로 바꾸세요.
 
 브랜드가 제공한 사실:
 {brand}
@@ -346,6 +347,10 @@ def generate(topic: str, retry_note: str = "") -> dict:
 {products}
 
 필수 기준:
+- 글의 중심은 웹검색으로 확인한 최신 생활정보여야 하며, 제품 소개나 사용법을 중심 주제로 삼지 않습니다.
+- 최근 24개월 안에 게시·갱신된 정부·공공기관의 공식 자료를 최소 1개 포함하고, 현재도 유효한 안내인지 확인합니다.
+- 제품은 본문 끝 CTA에서만 자연스럽게 연결합니다. products.json에 명시되지 않은 크기·구조·설정법·성능은 추측하지 않습니다.
+- 제목과 각 H2에 "H2"라는 글자를 넣지 않습니다.
 - 제목은 고객이 검색하는 질문형이며 48자 이내입니다(사이트명 포함 title 60자 이내).
 - description은 80~150자, 첫 문단은 질문에 2~3문장으로 직접 답합니다.
 - 글의 80% 이상은 독자가 바로 적용할 수 있는 구체적인 생활 정보로 채웁니다.
