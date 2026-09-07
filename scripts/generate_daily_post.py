@@ -8,11 +8,13 @@ only Python and OPENAI_API_KEY. It updates every discovery file used by the site
 from __future__ import annotations
 
 import argparse
+from difflib import SequenceMatcher
 import html
 import json
 import os
 import re
 import sys
+import time as time_module
 import urllib.error
 import urllib.request
 from datetime import date, datetime, time, timezone, timedelta
@@ -59,9 +61,7 @@ def next_topic() -> str:
     topics = unchecked_topics()
     if not topics:
         fail("story/ideas.md에 남은 미발행 주제가 없습니다.")
-    posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
-    previous_family = topic_family(posts[0]["title"]) if posts else None
-    return next((topic for topic in topics if topic_family(topic) != previous_family), topics[0])
+    return topics[0]
 
 
 def unchecked_topics() -> list[str]:
@@ -73,20 +73,30 @@ def call_openai(payload: dict) -> dict:
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         fail("OPENAI_API_KEY가 설정되지 않았습니다.")
-    request = urllib.request.Request(
-        "https://api.openai.com/v1/responses",
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=300) as response:
-            raw = json.load(response)
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:2000]
-        fail(f"OpenAI API 요청 실패({exc.code}): {detail}")
-    except urllib.error.URLError as exc:
-        fail(f"OpenAI API 연결 실패: {exc.reason}")
+    raw = None
+    for attempt in range(3):
+        request = urllib.request.Request(
+            "https://api.openai.com/v1/responses",
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=300) as response:
+                raw = json.load(response)
+            break
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")[:2000]
+            if exc.code not in (408, 409, 429) and exc.code < 500:
+                fail(f"OpenAI API 요청 실패({exc.code}): {detail}")
+            if attempt == 2:
+                fail(f"OpenAI API 재시도 실패({exc.code}): {detail}")
+        except urllib.error.URLError as exc:
+            if attempt == 2:
+                fail(f"OpenAI API 연결 재시도 실패: {exc.reason}")
+        time_module.sleep(5 * (attempt + 1))
+    if raw is None:
+        fail("OpenAI API가 결과를 반환하지 않았습니다.")
 
     output_text = "".join(
         part.get("text", "")
@@ -115,7 +125,7 @@ def fetch_trend_signals() -> dict:
     return {"available": True, "dataMeaning": payload.get("dataMeaning"), "cards": payload.get("cards", [])}
 
 
-def select_best_topic() -> tuple[str, list[dict], dict]:
+def legacy_scored_topic_selection() -> tuple[str, list[dict], dict]:
     brand = (STORY / "brand.md").read_text(encoding="utf-8")
     products = (ROOT / "products.json").read_text(encoding="utf-8")
     posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
@@ -185,6 +195,14 @@ def select_best_topic() -> tuple[str, list[dict], dict]:
     if candidates[0]["total"] < 70:
         fail(f"오늘은 70점 이상 글감이 없습니다. 최고점: {candidates[0]['total']}점")
     return candidates[0]["title"], candidates, trend_signals
+
+
+def select_material_topic() -> tuple[str, dict]:
+    topic = next_topic()
+    return topic, {
+        "method": "material_first_no_scoring",
+        "reason": "story/ideas.md의 첫 미발행 주제와 제공된 브랜드·제품 자료로 초안을 작성했습니다.",
+    }
 
 
 def replenish_topics() -> int:
@@ -309,6 +327,7 @@ def generate(topic: str, retry_note: str = "") -> dict:
     brand = (STORY / "brand.md").read_text(encoding="utf-8")
     existing = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
     existing_titles = "\n".join(f"- {p['title']}" for p in existing[:30])
+    existing_faqs = "\n".join(f"- {faq['q']}" for p in existing[:30] for faq in p.get("faq", []))
     products = (ROOT / "products.json").read_text(encoding="utf-8")
     prompt = f"""아래 주제로 위드리빙 공식 블로그 글 한 편을 한국어로 작성하세요.
 
@@ -319,6 +338,9 @@ def generate(topic: str, retry_note: str = "") -> dict:
 
 기존 글 제목(중복 금지):
 {existing_titles}
+
+기존 FAQ 질문(의미가 같은 질문도 반복 금지):
+{existing_faqs}
 
 실제 제품 정보와 구매 URL(이 파일에 있는 정보만 사용):
 {products}
@@ -334,7 +356,7 @@ def generate(topic: str, retry_note: str = "") -> dict:
 - 웹 검색으로 확인한 공공기관, 학회, 논문, 제조사 공식 페이지 등 신뢰할 만한 1차 출처만 사용합니다.
 - 출처는 sources 배열에만 넣고, intro·sections·FAQ 안에는 URL, 마크다운 링크, 괄호형 인라인 출처를 넣지 않습니다.
 - 가격·효능·수치·인증·후기·경험을 만들지 않습니다. 브랜드가 제공한 사실 외의 브랜드 경험도 만들지 않습니다.
-- FAQ는 본문과 다른 실용 질문 3개입니다.
+- FAQ는 본문과 다른 실용 질문 3개이며, 기존 FAQ의 단어만 바꿔 다시 묻지 않습니다.
 - CTA는 products.json의 실제 쿠팡 제품 URL 중 자연스럽게 맞는 것을 사용하고, 맞는 제품이 없으면 products.json의 storeUrl을 사용합니다.
 - slug는 날짜 없는 영문 소문자 하이픈 형식입니다.
 {f'- 이전 생성본이 검증에 실패했습니다: {retry_note}. 같은 오류 없이 전체 JSON을 새로 작성하세요.' if retry_note else ''}
@@ -367,6 +389,21 @@ def validate(post: dict) -> None:
         fail("slug 형식이 올바르지 않습니다.")
     if (STORY / f"{post['slug']}.html").exists():
         fail(f"이미 존재하는 slug입니다: {post['slug']}")
+    existing_posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
+    clean = lambda value: re.sub(r"\s*[|\uff5c]\s*위드리빙\s*$", "", value).strip()
+    similar_titles = [
+        item["title"] for item in existing_posts
+        if SequenceMatcher(None, clean(post["title"]), clean(item["title"])).ratio() >= 0.82
+    ]
+    if similar_titles:
+        fail(f"기존 글과 질문·핵심 답이 너무 비슷합니다: {', '.join(similar_titles)}")
+    existing_faqs = [faq["q"] for item in existing_posts[:30] for faq in item.get("faq", [])]
+    repeated_faqs = [
+        faq["q"] for faq in post["faq"]
+        if any(SequenceMatcher(None, faq["q"], old).ratio() >= 0.82 for old in existing_faqs)
+    ]
+    if repeated_faqs:
+        fail(f"기존 FAQ와 너무 비슷한 질문입니다: {', '.join(repeated_faqs)}")
     if len(post["faq"]) != 3 or not 3 <= len(post["sections"]) <= 5:
         fail("FAQ 또는 본문 절 개수가 규격과 다릅니다.")
     generated_text = json.dumps({k: v for k, v in post.items() if k not in ("sources", "cta_url")}, ensure_ascii=False)
@@ -558,7 +595,7 @@ def main() -> None:
         print(f"자동 발행 준비 완료. 다음 주제: {next_topic()}")
         return
     added = replenish_topics()
-    topic, topic_candidates, trend_signals = select_best_topic()
+    topic, selection = select_material_topic()
     published = args.date or datetime.now(KST).date().isoformat()
     date.fromisoformat(published)
     post = generate_valid_post(topic)
@@ -581,10 +618,8 @@ def main() -> None:
         ],
         "remaining_ideas": len(unchecked_topics()),
         "added_ideas": added,
-        "topic_score": topic_candidates[0]["total"],
-        "topic_reason": topic_candidates[0]["reason"],
-        "topic_candidates": topic_candidates,
-        "trend_api_used": trend_signals.get("available", False),
+        "topic_reason": selection["reason"],
+        "selection_method": selection["method"],
     }
     (ROOT / "daily-review.json").write_text(
         json.dumps(review, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
