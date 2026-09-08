@@ -40,13 +40,14 @@ def fail(message: str) -> None:
 
 
 TOPIC_FAMILIES = (
-    ("tissue", ("티슈", "휴지")),
     ("seat", ("방석", "쿠션", "메모리폼")),
     ("lumbar", ("허리", "복대")),
     ("lock", ("자물쇠", "와이어")),
     ("humidifier", ("가습기",)),
     ("storage", ("수납", "정리")),
 )
+
+EXCLUDED_TOPIC_TERMS = ("티슈케이스", "각티슈", "크리넥스")
 
 
 def topic_family(title: str) -> str:
@@ -66,7 +67,11 @@ def next_topic() -> str:
 
 def unchecked_topics() -> list[str]:
     text = (STORY / "ideas.md").read_text(encoding="utf-8")
-    return [item.strip() for item in re.findall(r"^- \[ \] (.+)$", text, re.MULTILINE)]
+    return [
+        item.strip()
+        for item in re.findall(r"^- \[ \] (.+)$", text, re.MULTILINE)
+        if not any(term in item for term in EXCLUDED_TOPIC_TERMS)
+    ]
 
 
 def call_openai(payload: dict) -> dict:
@@ -231,7 +236,8 @@ def replenish_topics() -> int:
 {faq_questions}
 
 제품의 선택법·사용법·관리법, 공간별 활용, 현재 계절, 기존 FAQ의 후속 질문을 고르게 활용하세요.
-10개 글감은 티슈케이스·방석·허리용품·자물쇠·가습기·수납 등 최소 5개 제품군으로 나누고, 같은 제품군은 2개를 넘기지 마세요.
+10개 글감은 계절 살림·실내환경·생활위생·안전·정리 등 최소 5개 생활 분야로 나누고, 같은 분야는 2개를 넘기지 마세요.
+각티슈·크리넥스·티슈케이스의 크기, 호환, 보충, 배치, 선택 또는 관리에 관한 글감은 만들지 마세요.
 의학적 진단·치료를 전제로 하거나 효능을 단정하는 질문은 제외하고, 각 항목은 자연스러운 한국어 질문 한 문장으로 작성하세요.
 """
     payload = {
@@ -348,6 +354,7 @@ def generate(topic: str, retry_note: str = "") -> dict:
 
 필수 기준:
 - 글의 중심은 웹검색으로 확인한 최신 생활정보여야 하며, 제품 소개나 사용법을 중심 주제로 삼지 않습니다.
+- 각티슈·크리넥스·티슈케이스의 크기, 호환, 보충, 배치, 선택 또는 관리 문제를 글의 주제로 삼지 않습니다.
 - 최근 24개월 안에 게시·갱신된 정부·공공기관의 공식 자료를 최소 1개 포함하고, 현재도 유효한 안내인지 확인합니다.
 - 제품은 본문 끝 CTA에서만 자연스럽게 연결합니다. products.json에 명시되지 않은 크기·구조·설정법·성능은 추측하지 않습니다.
 - 제목과 각 H2에 "H2"라는 글자를 넣지 않습니다.
