@@ -8,6 +8,8 @@ only Python and OPENAI_API_KEY. It updates every discovery file used by the site
 from __future__ import annotations
 
 import argparse
+import base64
+from functools import lru_cache
 from difflib import SequenceMatcher
 import html
 import json
@@ -58,11 +60,80 @@ def topic_family(title: str) -> str:
     return "other"
 
 
+
+def normalized_title(value: str) -> str:
+    value = re.sub(r"[|｜].*$", "", value)
+    return re.sub(r"[^가-힣a-z0-9]", "", value.lower())
+
+
+def similar_title(left: str, right: str) -> bool:
+    return SequenceMatcher(None, normalized_title(left), normalized_title(right)).ratio() >= 0.76
+
+
+@lru_cache(maxsize=1)
+def pending_posts() -> list[dict]:
+    """Reserve topics from open daily PRs; API errors must stop publication."""
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if not repo:
+        return []
+    if not token:
+        fail("대기 글 확인에 필요한 GitHub 토큰이 없습니다.")
+
+    def fetch(path):
+        request = urllib.request.Request(f"https://api.github.com/repos/{repo}/{path}",
+            headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return json.load(response)
+
+    result = []
+    for page in range(1, 101):
+        prs = fetch(f"pulls?state=open&per_page=100&page={page}")
+        for pr in prs:
+            if not pr["head"]["ref"].startswith("codex/daily-withliving-story-"):
+                continue
+            sha = pr["head"]["sha"]
+            content = fetch(f"contents/daily-review.json?ref={sha}")
+            review = json.loads(base64.b64decode(content["content"]))
+            ideas = fetch(f"contents/story/ideas.md?ref={sha}")
+            checked = re.findall(r"^- \[x\] (.+)$", base64.b64decode(ideas["content"]).decode(), re.MULTILINE)
+            result.append({"title": review["title"], "url": review["slug"] + ".html",
+                           "topic": review.get("topic", ""), "reserved_topics": checked, "faq": []})
+        if len(prs) < 100:
+            return result
+    fail("대기 PR 목록이 너무 많아 중복 확인을 완료하지 못했습니다.")
+
+
+def known_posts() -> list[dict]:
+    return json.loads((STORY / "posts.json").read_text(encoding="utf-8")) + pending_posts()
+
+
+def normalize_citations(post: dict) -> dict:
+    """Unwrap only links already preserved in sources; unknown links still fail validation."""
+    source_urls = {item["url"] for item in post["sources"]}
+    def clean(value):
+        if isinstance(value, str):
+            value = re.sub(r"\[([^]\n]+)\]\((https?://[^\s]+)\)",
+                           lambda m: m[1] if m[2] in source_urls else m[0], value)
+            return re.sub(r"cite[^]*", "", value).strip()
+        if isinstance(value, list):
+            return [clean(item) for item in value]
+        if isinstance(value, dict):
+            return {k: clean(v) for k, v in value.items()}
+        return value
+    return {k: v if k in ("sources", "cta_url", "slug") else clean(v) for k, v in post.items()}
+
+
 def next_topic() -> str:
     topics = unchecked_topics()
     if not topics:
         fail("story/ideas.md에 남은 미발행 주제가 없습니다.")
-    return topics[0]
+    known = known_posts()
+    reserved = {topic for item in known for topic in item.get("reserved_topics", [])}
+    for topic in topics:
+        if topic not in reserved and not any(similar_title(topic, item.get("topic") or item["title"]) for item in known):
+            return topic
+    fail("발행·대기 글과 겹치지 않는 글감이 없습니다.")
 
 
 def unchecked_topics() -> list[str]:
@@ -96,9 +167,9 @@ def call_openai(payload: dict) -> dict:
                 fail(f"OpenAI API 요청 실패({exc.code}): {detail}")
             if attempt == 2:
                 fail(f"OpenAI API 재시도 실패({exc.code}): {detail}")
-        except urllib.error.URLError as exc:
+        except (urllib.error.URLError, TimeoutError) as exc:
             if attempt == 2:
-                fail(f"OpenAI API 연결 재시도 실패: {exc.reason}")
+                fail(f"OpenAI API 연결 재시도 실패: {exc}")
         time_module.sleep(5 * (attempt + 1))
     if raw is None:
         fail("OpenAI API가 결과를 반환하지 않았습니다.")
@@ -331,8 +402,8 @@ def response_schema() -> dict:
 
 def generate(topic: str, retry_note: str = "") -> dict:
     brand = (STORY / "brand.md").read_text(encoding="utf-8")
-    existing = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
-    existing_titles = "\n".join(f"- {p['title']}" for p in existing[:30])
+    existing = known_posts()
+    existing_titles = "\n".join(f"- {p['title']}" for p in existing)
     existing_faqs = "\n".join(f"- {faq['q']}" for p in existing[:30] for faq in p.get("faq", []))
     products = (ROOT / "products.json").read_text(encoding="utf-8")
     prompt = f"""웹검색을 통해 지금 독자에게 유용한 최신·계절성 생활정보를 찾아 위드리빙 공식 블로그 글 한 편을 한국어로 작성하세요.
@@ -401,11 +472,10 @@ def validate(post: dict) -> None:
         fail("slug 형식이 올바르지 않습니다.")
     if (STORY / f"{post['slug']}.html").exists():
         fail(f"이미 존재하는 slug입니다: {post['slug']}")
-    existing_posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
-    clean = lambda value: re.sub(r"\s*[|\uff5c]\s*위드리빙\s*$", "", value).strip()
+    existing_posts = known_posts()
     similar_titles = [
         item["title"] for item in existing_posts
-        if SequenceMatcher(None, clean(post["title"]), clean(item["title"])).ratio() >= 0.82
+        if similar_title(post["title"], item["title"]) or item.get("url") == post["slug"] + ".html"
     ]
     if similar_titles:
         fail(f"기존 글과 질문·핵심 답이 너무 비슷합니다: {', '.join(similar_titles)}")
@@ -441,14 +511,15 @@ def validate(post: dict) -> None:
 
 def generate_valid_post(topic: str) -> dict:
     validation_error = ""
-    for attempt in range(3):
-        post = generate(topic, validation_error)
+    for attempt in range(4):
         try:
+            post = normalize_citations(generate(topic, validation_error))
             validate(post)
             return post
-        except SystemExit as exc:
+        except (SystemExit, ValueError, KeyError, TypeError) as exc:
             validation_error = str(exc)
-            if attempt == 2:
+            print(f"생성 검증 {attempt + 1}/4 실패: {validation_error}", file=sys.stderr, flush=True)
+            if attempt == 3:
                 raise
     fail("글 검증 재시도에 실패했습니다.")
 
@@ -606,10 +677,14 @@ def main() -> None:
         ET.parse(ROOT / "feed.xml")
         print(f"자동 발행 준비 완료. 다음 주제: {next_topic()}")
         return
-    added = replenish_topics()
-    topic, selection = select_material_topic()
     published = args.date or datetime.now(KST).date().isoformat()
     date.fromisoformat(published)
+    if any(p["date"] == published for p in json.loads((STORY / "posts.json").read_text())):
+        print(f"{published} 글이 이미 발행되어 생성을 건너뜁니다.")
+        return
+    pending_posts()
+    added = replenish_topics()
+    topic, selection = select_material_topic()
     post = generate_valid_post(topic)
     current_posts = json.loads((STORY / "posts.json").read_text(encoding="utf-8"))
     (STORY / f"{post['slug']}.html").write_text(render_page(post, published, current_posts[0] if current_posts else None), encoding="utf-8")
@@ -620,6 +695,8 @@ def main() -> None:
     update_llms(posts)
     review = {
         "title": post["title"],
+        "topic": topic,
+        "date": published,
         "slug": post["slug"],
         "url": f"{DOMAIN}/story/{post['slug']}.html",
         "article_markdown": article_markdown(post),
