@@ -2,7 +2,7 @@ name: Daily WITH LIVING blog
 
 on:
   schedule:
-    # 12:30 UTC = 21:30 Asia/Seoul
+    # 12:30 UTC = 21:30 Asia/Seoul (GitHub may delay scheduled runs)
     - cron: "30 12 * * *"
   workflow_dispatch:
 
@@ -15,103 +15,76 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  start-gate:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check.outputs.run }}
-    steps:
-      - id: check
-        name: Start on 2026-09-03 KST
-        run: |
-          local_date="$(TZ=Asia/Seoul date +%F)"
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" || "$local_date" > "2026-09-02" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
-
   publish:
-    needs: start-gate
-    if: needs.start-gate.outputs.run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Check out main
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
-
-      - name: Create today's review branch
-        run: git switch -c "codex/daily-withliving-story-$(TZ=Asia/Seoul date +%F)-${{ github.run_id }}"
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Generate today's post
+      - name: Run regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Fix publication date for this run
+        run: echo "PUBLISH_DATE=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_ENV"
+      - name: Generate and validate today's post
+        id: generate
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: gpt-5.4-mini
-        run: python scripts/generate_daily_post.py
-
-      - name: Validate generated files
         run: |
+          python scripts/generate_daily_post.py --date "$PUBLISH_DATE"
           python -m json.tool story/posts.json >/dev/null
           python -m json.tool daily-review.json >/dev/null
           python -c "from xml.etree import ElementTree as ET; ET.parse('sitemap.xml'); ET.parse('feed.xml')"
-          python scripts/audit_site.py
+          python scripts/audit_site.py --strict
           git restore reports/seo-audit.md
-          test -z "$(git diff --check)"
-
-      - name: Commit review branch
+          git diff --check
+          if git diff --quiet -- story/posts.json; then
+            echo "created=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit validated post and create pull request
+        if: steps.generate.outputs.created == 'true'
+        id: pr
         run: |
+          branch="codex/daily-withliving-story-${PUBLISH_DATE}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git switch -c "$branch"
           git config user.name "kyoungsook70"
           git config user.email "kyoungsook70@users.noreply.github.com"
           git add story sitemap.xml feed.xml llms.txt daily-review.json
-          git diff --cached --quiet && exit 0
-          git commit -m "Publish daily WITH LIVING story $(TZ=Asia/Seoul date +%F)"
+          git commit -m "Publish daily WITH LIVING story ${PUBLISH_DATE}"
           git push --set-upstream origin HEAD
-
-      - name: Open human-review pull request
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
           python - <<'PY'
           import json
           from pathlib import Path
-
-          review = json.loads(Path("daily-review.json").read_text(encoding="utf-8"))
-          checks = "\n".join(f"- [ ] {item}" for item in review["fact_check"])
-          body = f"""## 오늘 쓴 글
-
-          - 제목: {review['title']}
-          - 공개 예정 URL: {review['url']}
-          - 남은 글감: {review['remaining_ideas']}개
-          - 새로 보충한 글감: {review['added_ideas']}개
-
-          > 공개 예정 URL은 Merge 전에는 404가 정상입니다. 아래에서 글 전체를 먼저 검토하세요.
-
-          ## 글 전체 미리보기
-
-          {review['article_markdown']}
-
-          ## 사람이 사실 확인할 문장
-
-          {checks}
-
-          확인 후 이 PR을 Merge하면 Vercel이 자동 배포합니다.
-
-          ## Merge 후 1분 확인
-
-          - [ ] ChatGPT 또는 Perplexity에서 공개 URL의 제목·FAQ 요약 확인
-          - [ ] Google Rich Results에서 FAQ·Breadcrumb 감지 확인
-          - [ ] Google Search Console에서 새 글 색인 생성 요청
-          """
-          Path("daily-pr-body.md").write_text(body, encoding="utf-8")
+          review = json.loads(Path('daily-review.json').read_text())
+          Path('/tmp/daily-pr-body.md').write_text(
+              f"검증 통과 후 자동 병합·배포하는 글입니다.\n\n제목: {review['title']}\n\n"
+              f"공개 URL: {review['url']}\n\n{review['article_markdown']}\n")
           PY
-          gh pr create \
-            --base main \
-            --head "$(git branch --show-current)" \
-            --title "오늘의 위드리빙 블로그: $(TZ=Asia/Seoul date +%F)" \
-            --body-file daily-pr-body.md
+          pr_url=$(gh pr create --base main --head "$branch" --title "오늘의 위드리빙 블로그: ${PUBLISH_DATE}" --body-file /tmp/daily-pr-body.md)
+          echo "number=${pr_url##*/}" >> "$GITHUB_OUTPUT"
+      - name: Merge only the validated revision
+        if: steps.generate.outputs.created == 'true'
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          git fetch origin main
+          # If main moved, retain the PR for reconciliation instead of merging stale lists.
+          test "$(git rev-parse HEAD^)" = "$(git rev-parse origin/main)"
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
+            -f sha="$(git rev-parse HEAD)" -f merge_method=merge > /tmp/merge-result.json
+          python -c "import json; assert json.load(open('/tmp/merge-result.json'))['merged']"
+      - name: Verify article and index on production
+        run: python scripts/verify_publication.py --date "$PUBLISH_DATE"
+      - name: Record failure
+        if: failure()
+        run: |
+          echo '## 자동발행 실패' >> "$GITHUB_STEP_SUMMARY"
+          echo '실패 단계와 재시도 로그를 확인하세요. 생성·검증 실패 글은 병합되지 않으며, 병합 후 공개 확인 실패는 배포 문제일 수 있습니다.' >> "$GITHUB_STEP_SUMMARY"
